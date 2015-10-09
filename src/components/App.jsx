@@ -129,7 +129,7 @@ class App extends React.Component {
       <div className="root">
         <AppBar style={{
             background: '#00693E'
-          }} title="Dartmouth Nutrition"/>
+          }} title="Dartmouth Food"/>
         {this.state.chosenVenue ? '': allVenues }
         {menus}
       </div>
