@@ -42,7 +42,7 @@ class App extends React.Component {
             loading: false,
             venues: resJSON.venues
           });
-        }, 1000);
+        }, 0);
       });
   }
   chooseMeal(meal, venue, i) {
@@ -100,28 +100,34 @@ class App extends React.Component {
       );
     });
 
-    const loading = <CircularProgress mode="indeterminate" size={1.5} />;
+    const loading = (
+      <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+      }}>
+        <CircularProgress mode="indeterminate" size={1.5} />
+      </div>
+    );
     const categories = this.state.categories;
     const menus = Object.keys(categories).map((key) => {
 
       return (
-
-          <List subheader={categories[key].length > 0 ? key : ''}>
-          {categories[key].map(recipe => {
-            return (
-              <ListItem>{recipe.name}</ListItem>
-            );
-          })}
-          </List>
-
+        <List subheader={categories[key].length > 0 ? key : ''}>
+        {categories[key].map(recipe => {
+          return (
+            <ListItem>{recipe.name}</ListItem>
+          );
+        })}
+        </List>
       );
     });
 
     const dom = (
       <div className="root">
-        <AppBar
-  title="Dartmouth Nutrition Information"
-  iconClassNameRight="muidocs-icon-navigation-expand-more" />
+        <AppBar title="Dartmouth Nutrition"/>
         {this.state.chosenVenue ? '': allVenues }
         {menus}
       </div>
