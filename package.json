@@ -1,0 +1,31 @@
+{
+  "name": "dartmouth-nutrition-frontend",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^2.10.2",
+    "lodash": "^3.10.1",
+    "material-ui": "^0.12.3",
+    "react": "^0.13.0",
+    "react-dom": "^0.14.0",
+    "react-tap-event-plugin": "^0.1.8",
+    "redux": "^3.0.2"
+  },
+  "devDependencies": {
+    "babelify": "^6.3.0",
+    "browser-sync": "^2.9.10",
+    "browserify": "^11.2.0",
+    "gulp": "^3.9.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-stylus": "^2.1.0",
+    "gulp-util": "^3.0.6",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.4.0"
+  }
+}
