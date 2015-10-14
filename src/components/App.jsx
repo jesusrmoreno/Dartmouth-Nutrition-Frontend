@@ -1,3 +1,10 @@
+'use strict';
+
+/**
+ * This is in early early alpha. The code is ugly and the flow is really
+ * convoluted. 
+ */
+
 import React from 'react';
 import { createStore } from 'redux';
 import AppBar from 'material-ui/lib/app-bar';
@@ -7,18 +14,6 @@ import CircularProgress from 'material-ui/lib/circular-progress.js';
 import Promise from 'bluebird';
 import _ from 'lodash';
 
-class VenueList extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    return (
-      <ul></ul>
-    );
-  }
-}
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -27,11 +22,13 @@ class App extends React.Component {
       categories: {},
       venues: [],
       recipes: [],
-      chosenVenue: undefined
+      chosenVenue: undefined,
+      shownMenus: []
     };
   }
   componentDidMount() {
-    fetch('http://ancient-springs-1342.herokuapp.com/api/v1/venues')
+    // get the list of venues and associated meals/menus etc..
+    fetch('http://localhost:2015/api/v1/venues')
       .then((res) => {
         return res.json();
       })
@@ -45,39 +42,38 @@ class App extends React.Component {
         }, 0);
       });
   }
-  chooseMeal(meal, venue, i) {
+  getStuff(menu) {
     this.setState({
       loading: true
     });
-    console.log(`http://ancient-springs-1342.herokuapp.com/api/v1/recipes?venueKey=${venue.key}&mealId=${meal.did}`);
-    fetch(`http://ancient-springs-1342.herokuapp.com/api/v1/recipes?venueKey=${venue.key}&mealId=${meal.did}`)
+    let venue = this.state.chosenVenue;
+    let meal = this.state.chosenMeal;
+    let menuId = menu.did;
+
+    // once we choose the meal and menu we can get the recipes..
+    console.log(`http://localhost:2015/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`);
+    fetch(`http://localhost:2015/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`)
       .then((res) => {
         return res.json();
       }).then((resJSON) => {
-        console.log(resJSON.recipes);
-
-        let currentVenue = this.state.venues[i];
-        let menus = currentVenue.menus;
-        let categories = {};
-
-        menus.forEach((m) => {
-          categories[m.name] = categories[m.name] || [];
-          _.sortBy(resJSON.recipes, 'name').forEach((r) => {
-            if (r.menuId === m.did) {
-              categories[m.name].push(r);
-            }
-          });
-        });
-
-        console.log(categories);
-
         this.setState({
           loading: false,
-          categories: categories,
-          chosenVenue: venue.name,
           recipes: resJSON.recipes
         });
       });
+  }
+
+  recipeInfo(recipe) {
+    alert(JSON.stringify(recipe.nutrients));
+  }
+
+  chooseMeal(meal, venue, i) {
+    // set the chosen meal when the user clicks on it..
+    this.setState({
+      chosenMeal: meal.did,
+      shownMenus: meal.menus,
+      chosenVenue: venue.key
+    });
   }
   render() {
     const venues = this.state.venues;
@@ -86,19 +82,31 @@ class App extends React.Component {
       return (
         <div key={venue.key}>
           <List subheader={venue.name}>
-          {venue.meals.map((meal) => {
-            return (
-              <ListItem
-                onClick={this.chooseMeal.bind(this, meal, venue, i)}
-              >
-                {meal.name}
-              </ListItem>
-            );
-          })}
+            {venue.meals.map((meal) => {
+              return (
+                <ListItem
+                  onClick={this.chooseMeal.bind(this, meal, venue, i)}
+                >
+                  {meal.name}
+                </ListItem>
+              );
+            })}
           </List>
         </div>
       );
     });
+
+    const recipeDOM = (
+      <List subheader="Recipes">
+        {recipes.map((recipe) => {
+          return (
+            <ListItem onClick={this.recipeInfo.bind(this, recipe)}>
+              {recipe.name}
+            </ListItem>
+          );
+        })};
+      </List>
+    );
 
     const loading = (
       <div style={{
@@ -112,26 +120,26 @@ class App extends React.Component {
       </div>
     );
     const categories = this.state.categories;
-    const menus = Object.keys(categories).map((key) => {
+    const menus = (
+      <List subheader="Menus">
 
+
+      {this.state.shownMenus.map((menu) => {
       return (
-        <List subheader={categories[key].length > 0 ? key : ''}>
-        {categories[key].map(recipe => {
-          return (
-            <ListItem>{recipe.name}</ListItem>
-          );
-        })}
-        </List>
-      );
-    });
+        <ListItem onClick={this.getStuff.bind(this, menu)}>{menu.name}</ListItem>
+      )})};
+      </List>
+    );
 
     const dom = (
       <div className="root">
         <AppBar style={{
             background: '#00693E'
           }} title="Dartmouth Food"/>
-        {this.state.chosenVenue ? '': allVenues }
-        {menus}
+        {this.state.chosenVenue ? '': allVenues}
+        {recipes.length > 0 ? recipeDOM : menus}
+
+
       </div>
     );
     return (
