@@ -2,7 +2,7 @@
 
 /**
  * This is in early early alpha. The code is ugly and the flow is really
- * convoluted. 
+ * convoluted.
  */
 
 import React from 'react';
@@ -13,6 +13,8 @@ import ListItem from 'material-ui/lib/lists/list-item.js';
 import CircularProgress from 'material-ui/lib/circular-progress.js';
 import Promise from 'bluebird';
 import _ from 'lodash';
+
+const host = "ancient-springs-1342.herokuapp.com";
 
 class App extends React.Component {
   constructor(props) {
@@ -28,7 +30,7 @@ class App extends React.Component {
   }
   componentDidMount() {
     // get the list of venues and associated meals/menus etc..
-    fetch('http://localhost:2015/api/v1/venues')
+    fetch(`http://${host}/api/v1/venues`)
       .then((res) => {
         return res.json();
       })
@@ -51,8 +53,8 @@ class App extends React.Component {
     let menuId = menu.did;
 
     // once we choose the meal and menu we can get the recipes..
-    console.log(`http://localhost:2015/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`);
-    fetch(`http://localhost:2015/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`)
+    console.log(`http://${host}/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`);
+    fetch(`http://${host}/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`)
       .then((res) => {
         return res.json();
       }).then((resJSON) => {
@@ -122,12 +124,10 @@ class App extends React.Component {
     const categories = this.state.categories;
     const menus = (
       <List subheader="Menus">
-
-
-      {this.state.shownMenus.map((menu) => {
-      return (
-        <ListItem onClick={this.getStuff.bind(this, menu)}>{menu.name}</ListItem>
-      )})};
+        {this.state.shownMenus.map((menu) => {
+        return (
+          <ListItem onClick={this.getStuff.bind(this, menu)}>{menu.name}</ListItem>
+        )})}
       </List>
     );
 
