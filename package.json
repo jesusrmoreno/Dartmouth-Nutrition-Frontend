@@ -10,11 +10,15 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^2.10.2",
+    "history": "^1.12.5",
     "lodash": "^3.10.1",
     "material-ui": "^0.12.3",
     "react": "^0.13.0",
     "react-dom": "^0.14.0",
+    "react-motion": "^0.3.1",
+    "react-router": "^1.0.0-rc3",
     "react-tap-event-plugin": "^0.1.8",
+    "reapp-ui": "^0.12.54",
     "redux": "^3.0.2"
   },
   "devDependencies": {

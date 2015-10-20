@@ -1,0 +1,64 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto';
+  color: #444444;
+  transition: all 250ms;
+}
+
+body, html, .root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+
+.app_container {
+  width: 100vw;
+  height: 100vh;
+  background: #f2f2f2;
+  display: flex;
+}
+
+.tabs {
+  background: white;
+}
+
+.column {
+  flex-direction: column;
+  overflow-y: scroll;
+  display: flex;
+  /*padding: 0em .5em;*/
+  background: white;
+  min-width: 25vw;
+  max-width: 25vw;
+  border-right: 1px solid rgba(0, 0, 0, .24);
+  /*flex: 1;*/
+}
+
+.allergen {
+  background: #EB4C52;
+}
+
+.column__title {
+  padding: .5em;
+  font-size: 1.1em;
+}
+
+.venue {
+  margin-bottom: 1em;
+}
+
+.list_item {
+  cursor: pointer;
+  padding: .5em;
+}
+
+.list_item:hover {
+  background: rgba(0, 0, 0, .1);
+}
+
+.selected {
+  background: rgba(0, 0, 0, .1);
+}

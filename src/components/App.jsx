@@ -1,155 +1,251 @@
 'use strict';
-
-/**
- * This is in early early alpha. The code is ugly and the flow is really
- * convoluted.
- */
-
 import React from 'react';
+import { render } from 'react-dom';
+import { Router, Route, Link } from 'react-router';
 import { createStore } from 'redux';
-import AppBar from 'material-ui/lib/app-bar';
-import List from 'material-ui/lib/lists/list.js';
-import ListItem from 'material-ui/lib/lists/list-item.js';
-import CircularProgress from 'material-ui/lib/circular-progress.js';
+import {Motion, spring} from 'react-motion';
 import Promise from 'bluebird';
 import _ from 'lodash';
 
-const host = "ancient-springs-1342.herokuapp.com";
+
+const HOST = "ancient-springs-1342.herokuapp.com";
+const initialState = {
+  loading: true,
+  venues: [],
+  activeVenue: {},
+  activeRecipe: {
+    nutrients: {},
+    allergens: {}
+  },
+  activeMeal: {
+    menus: []
+  },
+  activeMenu: {},
+  recipes: []
+};
+
+function updateState(oldState, newState) {
+  return _.assign({}, oldState, newState);
+}
+
+function appState(state = initialState, action) {
+  switch (action.type) {
+    case 'LOADING':
+      return state;
+      break;
+    case 'INITIAL_LOAD':
+      return updateState(state, {
+        venues: action.venues,
+        loading: false
+      });
+    case 'TOGGLE_ACTIVE_MEAL':
+      return updateState(state, {
+        activeVenue: action.venue,
+        activeMeal: action.meal,
+        activeMenu: {},
+        recipes: [],
+        activeRecipe: {
+          nutrients: {},
+          allergens: {}
+        },
+      });
+    case 'TOGGLE_ACTIVE_MENU':
+      return updateState(state, {
+        activeMenu: action.menu
+      });
+
+    case 'TOGGLE_ACTIVE_RECIPE':
+      return updateState(state, {
+        activeRecipe: action.recipe
+      });
+
+    case 'RECIPE_GET':
+      return updateState(state, {
+        recipes: action.recipes
+      });
+    default:
+      return state;
+  }
+}
+
+let store = createStore(appState);
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      loading: true,
-      categories: {},
-      venues: [],
-      recipes: [],
-      chosenVenue: undefined,
-      shownMenus: []
-    };
+    this.state = store.getState();
+    store.subscribe(() => {
+      this.setState(store.getState());
+    });
   }
+
   componentDidMount() {
-    // get the list of venues and associated meals/menus etc..
-    fetch(`http://${host}/api/v1/venues`)
+    fetch(`http://${HOST}/api/v1/venues`)
       .then((res) => {
         return res.json();
       })
       .then((resJSON) => {
-        setTimeout(() => {
-          console.log(resJSON.venues);
-          this.setState({
-            loading: false,
-            venues: resJSON.venues
-          });
-        }, 0);
-      });
-  }
-  getStuff(menu) {
-    this.setState({
-      loading: true
-    });
-    let venue = this.state.chosenVenue;
-    let meal = this.state.chosenMeal;
-    let menuId = menu.did;
-
-    // once we choose the meal and menu we can get the recipes..
-    console.log(`http://${host}/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`);
-    fetch(`http://${host}/api/v1/recipes?venueKey=${venue}&mealId=${meal}&menu=${menuId}`)
-      .then((res) => {
-        return res.json();
-      }).then((resJSON) => {
-        this.setState({
-          loading: false,
-          recipes: resJSON.recipes
+        console.log(resJSON.venues);
+        store.dispatch({
+          type: 'INITIAL_LOAD',
+          venues: resJSON.venues
         });
       });
   }
 
-  recipeInfo(recipe) {
-    alert(JSON.stringify(recipe.nutrients));
-  }
-
-  chooseMeal(meal, venue, i) {
-    // set the chosen meal when the user clicks on it..
-    this.setState({
-      chosenMeal: meal.did,
-      shownMenus: meal.menus,
-      chosenVenue: venue.key
+  setActiveMeal(venue, meal) {
+    store.dispatch({
+      type: 'TOGGLE_ACTIVE_MEAL',
+      meal: meal,
+      venue: venue,
     });
   }
+
+  setActiveRecipe(recipe) {
+    store.dispatch({
+      type: 'TOGGLE_ACTIVE_RECIPE',
+      recipe: recipe,
+    });
+  }
+
+  getRecipes(menu) {
+    store.dispatch({
+      type: 'TOGGLE_ACTIVE_MENU',
+      menu: menu,
+    });
+
+    const venue = this.state.activeVenue.key;
+    const menuId = menu.did;
+    const meal = this.state.activeMeal.did;
+    fetch(`http://${HOST}/api/v1/recipes?venueKey=${venue}&menuId=${menuId}&mealId=${meal}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((resJSON) => {
+        store.dispatch({
+          type: 'RECIPE_GET',
+          recipes: _.sortBy(_.uniq(resJSON.recipes, 'did'), 'name')
+        });
+      });
+  }
+
   render() {
-    const venues = this.state.venues;
-    const recipes = this.state.recipes;
-    const allVenues = venues.map((venue, i) => {
-      return (
-        <div key={venue.key}>
-          <List subheader={venue.name}>
-            {venue.meals.map((meal) => {
-              return (
-                <ListItem
-                  onClick={this.chooseMeal.bind(this, meal, venue, i)}
-                >
-                  {meal.name}
-                </ListItem>
-              );
-            })}
-          </List>
-        </div>
-      );
-    });
-
-    const recipeDOM = (
-      <List subheader="Recipes">
-        {recipes.map((recipe) => {
+    const ALLERGENS = _.isUndefined(this.state.activeRecipe.allergens) ? [] : Object.keys(this.state.activeRecipe.allergens);
+    const ALLERGEN_DOM = (
+      <div>
+        <h1>{ALLERGENS.length > 0 ? 'Allergens' : ''}</h1>
+        {ALLERGENS.map(key => {
           return (
-            <ListItem onClick={this.recipeInfo.bind(this, recipe)}>
-              {recipe.name}
-            </ListItem>
-          );
-        })};
-      </List>
-    );
-
-    const loading = (
-      <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          width: '100vw',
-      }}>
-        <CircularProgress mode="indeterminate" size={1.5} />
+            <div className="allergen">{key}</div>
+          )
+        })}
       </div>
-    );
-    const categories = this.state.categories;
-    const menus = (
-      <List subheader="Menus">
-        {this.state.shownMenus.map((menu) => {
-        return (
-          <ListItem onClick={this.getStuff.bind(this, menu)}>{menu.name}</ListItem>
-        )})}
-      </List>
-    );
 
-    const dom = (
-      <div className="root">
-        <AppBar style={{
-            background: '#00693E'
-          }} title="Dartmouth Food"/>
-        {this.state.chosenVenue ? '': allVenues}
-        {recipes.length > 0 ? recipeDOM : menus}
-
-
-      </div>
     );
     return (
-      this.state.loading ? loading : dom
+      <div className="app_container">
+        <div className="venue_list column">
+          {this.state.venues.map((venue) => {
+            return (
+              <div className="venue column">
+                <div className="column__title">
+                  {venue.name}
+                </div>
+                <div className="meal_list column">
+                  {_.sortBy(venue.meals, 'startTime').map((meal) => {
+                    let classes = 'meal list_item';
+                    if (this.state.activeVenue.key === venue.key && this.state.activeMeal.name === meal.name) {
+                      classes = 'meal selected list_item';
+                    }
+                    return (
+                      <div
+                        className={classes}
+                        onMouseOver={this.setActiveMeal.bind(this, venue, meal)}
+                      >
+                        {meal.name}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="menu_list column">
+          <div className="column__title">
+            <span>
+              Menus
+            </span>
+          </div>
+          {this.state.activeMeal.menus.map((menu) => {
+            let classes = 'menu list_item';
+            if (this.state.activeMenu.name === menu.name) {
+              classes = 'menu selected list_item';
+            }
+            return (
+              <div
+                className={classes}
+                onClick={this.getRecipes.bind(this, menu)}
+              >
+                {menu.name}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="recipe_list column">
+          <div className="column__title">
+            <div style={{
+                padding: '0em 0em 1em'
+            }}>
+              Recipes
+            </div>
+          </div>
+          {this.state.recipes.map(recipe => {
+            let classes = 'list_item';
+            if (this.state.activeRecipe.name === recipe.name) {
+              classes = 'selected list_item';
+            }
+            return (
+              <div className="recipe">
+                <div
+                  className={classes}
+                  onMouseOver={this.setActiveRecipe.bind(this, recipe)}
+                >{recipe.name}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="recipe_info column">
+          <div className="column__title">
+            <div style={{
+                padding: '0em 0em 1em'
+            }}>
+              Nutritional Info
+            </div>
+          </div>
+          {ALLERGEN_DOM}
+          {Object.keys(this.state.activeRecipe.nutrients).map(key => {
+            const value = this.state.activeRecipe.nutrients[key];
+            if (value !== '' && key !== 'title') {
+              return (
+                <div>
+                  <div className="list_item">{key} : {value}</div>
+                </div>
+              );
+            } else {
+              return null;
+            }
+          })}
+        </div>
+      </div>
     );
   }
 }
 
 
+
 React.render(
-  <App />,
+  <App/>,
   document.querySelector('#root')
 );
