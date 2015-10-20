@@ -37,6 +37,13 @@ body, html, .root {
   /*flex: 1;*/
 }
 
+.preference {
+  background: #42A9F3;
+  color: white;
+  padding: .5em;
+  font-weight: bold;
+}
+
 .allergen {
   background: #EB4C52;
   color: white;

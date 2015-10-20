@@ -130,6 +130,18 @@ class App extends React.Component {
   }
 
   render() {
+    console.log(this.state.activeRecipe);
+    const PREFS = _.isUndefined(this.state.activeRecipe.dietaryPreferences) ? [] : Object.keys(this.state.activeRecipe.dietaryPreferences);
+    const PREFS_DOM = (
+      <div>
+        <h1>{PREFS.length > 0 ? 'Dietary Prefs' : ''}</h1>
+        {PREFS.map(key => {
+          return (
+            <div className="preference">{key}</div>
+          )
+        })}
+      </div>
+    );
     const ALLERGENS = _.isUndefined(this.state.activeRecipe.allergens) ? [] : Object.keys(this.state.activeRecipe.allergens);
     const ALLERGEN_DOM = (
       <div>
@@ -140,7 +152,6 @@ class App extends React.Component {
           )
         })}
       </div>
-
     );
     return (
       <div className="app_container">
@@ -224,6 +235,7 @@ class App extends React.Component {
               Nutritional Info
             </div>
           </div>
+          {PREFS_DOM}
           {ALLERGEN_DOM}
           {Object.keys(this.state.activeRecipe.nutrients).map(key => {
             const value = this.state.activeRecipe.nutrients[key];
