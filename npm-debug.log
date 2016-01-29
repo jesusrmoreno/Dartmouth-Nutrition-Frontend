@@ -1,0 +1,113 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/jesusrmoreno/.nvm/versions/io.js/v3.0.0/bin/iojs',
+1 verbose cli   '/Users/jesusrmoreno/.nvm/versions/io.js/v3.0.0/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'parse/node' ]
+2 info using npm@2.13.3
+3 info using node@v3.0.0
+4 verbose install initial load of /Users/jesusrmoreno/Documents/Projects/dart_mouth/package.json
+5 warn package.json dart_mouth@1.0.0 No description
+6 warn package.json dart_mouth@1.0.0 No repository field.
+7 warn package.json dart_mouth@1.0.0 No README data
+8 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/babel-preset-es2015/package.json
+9 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/babel-preset-react/package.json
+10 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/babelify/package.json
+11 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/bluebird/package.json
+12 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/color/package.json
+13 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/lodash/package.json
+14 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/moment/package.json
+15 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/object-assign/package.json
+16 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/parse/package.json
+17 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/radium/package.json
+18 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/react/package.json
+19 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/react-bootstrap/package.json
+20 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/react-datepicker/package.json
+21 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/react-dom/package.json
+22 verbose installManyTop reading scoped package data from /Users/jesusrmoreno/Documents/Projects/dart_mouth/node_modules/redux/package.json
+23 verbose readDependencies loading dependencies from /Users/jesusrmoreno/Documents/Projects/dart_mouth/package.json
+24 silly cache add args [ 'parse/node', null ]
+25 verbose cache add spec parse/node
+26 silly cache add parsed spec { raw: 'parse/node',
+26 silly cache add   scope: null,
+26 silly cache add   name: null,
+26 silly cache add   rawSpec: 'parse/node',
+26 silly cache add   spec: 'github:parse/node',
+26 silly cache add   type: 'hosted',
+26 silly cache add   hosted:
+26 silly cache add    { type: 'github',
+26 silly cache add      ssh: 'git@github.com:parse/node.git',
+26 silly cache add      sshUrl: 'git+ssh://git@github.com/parse/node.git',
+26 silly cache add      httpsUrl: 'git+https://github.com/parse/node.git',
+26 silly cache add      gitUrl: 'git://github.com/parse/node.git',
+26 silly cache add      shortcut: 'github:parse/node',
+26 silly cache add      directUrl: 'https://raw.githubusercontent.com/parse/node/master/package.json' } }
+27 verbose addRemoteGit caching parse/node
+28 verbose addRemoteGit parse/node is a repository hosted by github
+29 silly tryGitProto attempting to clone git://github.com/parse/node.git
+30 silly tryClone cloning parse/node via git://github.com/parse/node.git
+31 verbose tryClone git-github-com-parse-node-git-fbc4b0f7 not in flight; caching
+32 info git [ 'clone',
+32 info git   '--template=/Users/jesusrmoreno/.npm/_git-remotes/_templates',
+32 info git   '--mirror',
+32 info git   'git://github.com/parse/node.git',
+32 info git   '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-fbc4b0f7' ]
+33 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-fbc4b0f7: Cloning into bare repository '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-fbc4b0f7'...
+33 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-fbc4b0f7: fatal: remote error:
+33 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-fbc4b0f7:   Repository not found.
+34 silly tryHTTPS attempting to clone git+https://github.com/parse/node.git
+35 silly tryClone cloning parse/node via git+https://github.com/parse/node.git
+36 verbose tryClone https-github-com-parse-node-git-0242efff not in flight; caching
+37 info git [ 'clone',
+37 info git   '--template=/Users/jesusrmoreno/.npm/_git-remotes/_templates',
+37 info git   '--mirror',
+37 info git   'https://github.com/parse/node.git',
+37 info git   '/Users/jesusrmoreno/.npm/_git-remotes/https-github-com-parse-node-git-0242efff' ]
+38 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror https://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/https-github-com-parse-node-git-0242efff: Cloning into bare repository '/Users/jesusrmoreno/.npm/_git-remotes/https-github-com-parse-node-git-0242efff'...
+38 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror https://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/https-github-com-parse-node-git-0242efff: remote: Repository not found.
+38 verbose git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror https://github.com/parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/https-github-com-parse-node-git-0242efff: fatal: repository 'https://github.com/parse/node.git/' not found
+39 silly trySSH attempting to clone git@github.com:parse/node.git
+40 silly tryClone cloning parse/node via git@github.com:parse/node.git
+41 verbose tryClone git-github-com-parse-node-git-1e8a8804 not in flight; caching
+42 info git [ 'clone',
+42 info git   '--template=/Users/jesusrmoreno/.npm/_git-remotes/_templates',
+42 info git   '--mirror',
+42 info git   'git@github.com:parse/node.git',
+42 info git   '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804' ]
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804: Cloning into bare repository '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804'...
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804: Permission denied (publickey).
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804: fatal: Could not read from remote repository.
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804:
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804: Please make sure you have the correct access rights
+43 error git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804: and the repository exists.
+44 verbose stack Error: Command failed: git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804
+44 verbose stack Cloning into bare repository '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804'...
+44 verbose stack Permission denied (publickey).
+44 verbose stack fatal: Could not read from remote repository.
+44 verbose stack
+44 verbose stack Please make sure you have the correct access rights
+44 verbose stack and the repository exists.
+44 verbose stack
+44 verbose stack     at ChildProcess.exithandler (child_process.js:197:12)
+44 verbose stack     at emitTwo (events.js:87:13)
+44 verbose stack     at ChildProcess.emit (events.js:172:7)
+44 verbose stack     at maybeClose (internal/child_process.js:764:16)
+44 verbose stack     at Socket.<anonymous> (internal/child_process.js:319:11)
+44 verbose stack     at emitOne (events.js:77:13)
+44 verbose stack     at Socket.emit (events.js:169:7)
+44 verbose stack     at Pipe._onclose (net.js:468:12)
+45 verbose cwd /Users/jesusrmoreno/Documents/Projects/dart_mouth
+46 error Darwin 14.4.0
+47 error argv "/Users/jesusrmoreno/.nvm/versions/io.js/v3.0.0/bin/iojs" "/Users/jesusrmoreno/.nvm/versions/io.js/v3.0.0/bin/npm" "install" "parse/node"
+48 error node v3.0.0
+49 error npm  v2.13.3
+50 error code 128
+51 error Command failed: git clone --template=/Users/jesusrmoreno/.npm/_git-remotes/_templates --mirror git@github.com:parse/node.git /Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804
+51 error Cloning into bare repository '/Users/jesusrmoreno/.npm/_git-remotes/git-github-com-parse-node-git-1e8a8804'...
+51 error Permission denied (publickey).
+51 error fatal: Could not read from remote repository.
+51 error
+51 error Please make sure you have the correct access rights
+51 error and the repository exists.
+52 error If you need help, you may report this error at:
+52 error     <https://github.com/npm/npm/issues>
+53 verbose exit [ 1, true ]
