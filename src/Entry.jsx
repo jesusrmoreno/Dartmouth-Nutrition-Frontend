@@ -16,8 +16,6 @@ import {
   Col,
 } from './Grid.js';
 
-
-
 let colorTheme = {
   selected: '#f2f2f2',
   hover: '#f2f2f2',
@@ -39,6 +37,7 @@ let defaultState = {
   selectedMeal: '',
   selectedRecipe: {},
   filterStage: 0,
+  route: 'menu',
 };
 
 let keyToName = {
@@ -86,6 +85,12 @@ function appState(state = defaultState, action) {
   case 'VENUE_SELECT':
     return objectAssign({}, state, {
       selectedVenue: action.venue
+    });
+
+
+  case 'UPDATE_ROUTE':
+    return objectAssign({}, state, {
+      route: action.route
     });
 
   case 'RECIPE_SELECT':
@@ -172,16 +177,16 @@ function localGetRecipes(venue, menu, meal, date) {
     updateRecipes(_.sortBy(recipes, 'name'));
   });
 
-  // console.log(finalOffering[0]);
-  // let offering = Parse.Object.createWithoutData(finalOffering[0].objectId);
-  // console.log(query);
-  // console.log(relation);
-  // // query.equalTo('recipes', offering);
-  // // query.find().then((res) => {
-  // //   console.log(res);
-  // // });
 
 }
+
+
+let updateRoute = (route) => {
+  store.dispatch({
+    type: 'UPDATE_ROUTE',
+    route: route
+  });
+};
 
 
 let updateOfferings = (offerings) => {
@@ -477,10 +482,32 @@ class Navigation extends React.Component {
 }
 Navigation = Radium(Navigation);
 
+class LoginView extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <Row style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 'calc(100vh - 6.4rem)',
+      }}>
+        Create new User
+      </Row>
+    );
+  }
+
+}
 
 class NavBar extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  handleRouteChange(route) {
+    updateRoute(route)
   }
   render() {
     return (
@@ -501,32 +528,61 @@ class NavBar extends React.Component {
           DartMouth
         </Col>
         <Row style={[fontStyles.subheading, {
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
           alignItems: 'center',
           color: 'white',
           padding: '.8rem',
-          height: '100%'
+          height: '100%',
+          flex: 1,
         }]}>
-          <Col style={{
-            padding: '.8rem'
+          <Row style={{
+            flex: 1
           }}>
-            Diary
-          </Col>
-          <Col style={{
-            padding: '.8rem'
-          }}>
-            Menu
-          </Col>
-          <Col style={{
-            padding: '.8rem'
-          }}>
-            Preferences
-          </Col>
+            <div key="userDiary" style={[fontStyles.subheading, {
+              padding: '.8rem',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }]} onClick={this.handleRouteChange.bind(this, "userDiary")}>
+              Diary
+            </div>
+            <div key="menu" style={[fontStyles.subheading, {
+              padding: '.8rem',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }]} onClick={this.handleRouteChange.bind(this, "menu")}>
+              Menu
+            </div>
+            <div key="userPreferences" style={[fontStyles.subheading, {
+              padding: '.8rem',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }]} onClick={this.handleRouteChange.bind(this, "userPreferences")}>
+              Preferences
+            </div>
+          </Row>
+          <div key="signup" style={[fontStyles.subheading, {
+            padding: '1.6rem',
+            cursor: 'pointer',
+            ':hover': {
+              textDecoration: 'underline',
+            },
+          }]} onClick={this.handleRouteChange.bind(this, "user")}>
+            Sign Up
+          </div>
         </Row>
       </Row>
     );
   }
 }
+
+NavBar = Radium(NavBar);
+
 
 class MenuView extends React.Component {
   constructor(props) {
@@ -569,10 +625,8 @@ class App extends React.Component {
     let venueKeys = venuesFromOfferings(this.state.offerings);
     let meals = mealsFromVenue(this.state.selectedVenue);
     let menus = menusFromMealVenue(this.state.selectedMeal, this.state.selectedVenue);
-
-    return (
-      <Grid>
-        <NavBar />
+    let ROUTES = {
+      menu: (
         <MenuView
           offerings={this.state.offerings}
           stage={this.state.filterStage}
@@ -583,6 +637,15 @@ class App extends React.Component {
           recipes={this.state.recipes}
           selectedRecipe={this.state.selectedRecipe}
         />
+      ),
+      user: (
+        <LoginView />
+      ),
+    };
+    return (
+      <Grid>
+        <NavBar />
+        {ROUTES[this.state.route]}
       </Grid>
     )
   }

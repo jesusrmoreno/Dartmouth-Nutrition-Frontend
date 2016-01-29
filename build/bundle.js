@@ -57109,7 +57109,8 @@ var defaultState = {
   selectedMenu: '',
   selectedMeal: '',
   selectedRecipe: {},
-  filterStage: 0
+  filterStage: 0,
+  route: 'menu'
 };
 
 var keyToName = {
@@ -57160,6 +57161,11 @@ function appState() {
     case 'VENUE_SELECT':
       return (0, _objectAssign2.default)({}, state, {
         selectedVenue: action.venue
+      });
+
+    case 'UPDATE_ROUTE':
+      return (0, _objectAssign2.default)({}, state, {
+        route: action.route
       });
 
     case 'RECIPE_SELECT':
@@ -57240,16 +57246,14 @@ function localGetRecipes(venue, menu, meal, date) {
 
     updateRecipes(_lodash2.default.sortBy(recipes, 'name'));
   });
-
-  // console.log(finalOffering[0]);
-  // let offering = Parse.Object.createWithoutData(finalOffering[0].objectId);
-  // console.log(query);
-  // console.log(relation);
-  // // query.equalTo('recipes', offering);
-  // // query.find().then((res) => {
-  // //   console.log(res);
-  // // });
 }
+
+var updateRoute = function updateRoute(route) {
+  store.dispatch({
+    type: 'UPDATE_ROUTE',
+    route: route
+  });
+};
 
 var updateOfferings = function updateOfferings(offerings) {
   store.dispatch({
@@ -57624,8 +57628,35 @@ var Navigation = (function (_React$Component3) {
 
 Navigation = (0, _radium2.default)(Navigation);
 
-var NavBar = (function (_React$Component4) {
-  _inherits(NavBar, _React$Component4);
+var LoginView = (function (_React$Component4) {
+  _inherits(LoginView, _React$Component4);
+
+  function LoginView(props) {
+    _classCallCheck(this, LoginView);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(LoginView).call(this, props));
+  }
+
+  _createClass(LoginView, [{
+    key: "render",
+    value: function render() {
+      return _react2.default.createElement(
+        _Grid.Row,
+        { style: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 'calc(100vh - 6.4rem)'
+          } },
+        "Create new User"
+      );
+    }
+  }]);
+
+  return LoginView;
+})(_react2.default.Component);
+
+var NavBar = (function (_React$Component5) {
+  _inherits(NavBar, _React$Component5);
 
   function NavBar(props) {
     _classCallCheck(this, NavBar);
@@ -57634,6 +57665,11 @@ var NavBar = (function (_React$Component4) {
   }
 
   _createClass(NavBar, [{
+    key: "handleRouteChange",
+    value: function handleRouteChange(route) {
+      updateRoute(route);
+    }
+  }, {
     key: "render",
     value: function render() {
       return _react2.default.createElement(
@@ -57659,32 +57695,62 @@ var NavBar = (function (_React$Component4) {
         _react2.default.createElement(
           _Grid.Row,
           { style: [_styles.fontStyles.subheading, {
-              justifyContent: 'center',
+              justifyContent: 'flex-end',
               alignItems: 'center',
               color: 'white',
               padding: '.8rem',
-              height: '100%'
+              height: '100%',
+              flex: 1
             }] },
           _react2.default.createElement(
-            _Grid.Col,
+            _Grid.Row,
             { style: {
-                padding: '.8rem'
+                flex: 1
               } },
-            "Diary"
+            _react2.default.createElement(
+              "div",
+              { key: "userDiary", style: [_styles.fontStyles.subheading, {
+                  padding: '.8rem',
+                  cursor: 'pointer',
+                  ':hover': {
+                    textDecoration: 'underline'
+                  }
+                }], onClick: this.handleRouteChange.bind(this, "userDiary") },
+              "Diary"
+            ),
+            _react2.default.createElement(
+              "div",
+              { key: "menu", style: [_styles.fontStyles.subheading, {
+                  padding: '.8rem',
+                  cursor: 'pointer',
+                  ':hover': {
+                    textDecoration: 'underline'
+                  }
+                }], onClick: this.handleRouteChange.bind(this, "menu") },
+              "Menu"
+            ),
+            _react2.default.createElement(
+              "div",
+              { key: "userPreferences", style: [_styles.fontStyles.subheading, {
+                  padding: '.8rem',
+                  cursor: 'pointer',
+                  ':hover': {
+                    textDecoration: 'underline'
+                  }
+                }], onClick: this.handleRouteChange.bind(this, "userPreferences") },
+              "Preferences"
+            )
           ),
           _react2.default.createElement(
-            _Grid.Col,
-            { style: {
-                padding: '.8rem'
-              } },
-            "Menu"
-          ),
-          _react2.default.createElement(
-            _Grid.Col,
-            { style: {
-                padding: '.8rem'
-              } },
-            "Preferences"
+            "div",
+            { key: "signup", style: [_styles.fontStyles.subheading, {
+                padding: '1.6rem',
+                cursor: 'pointer',
+                ':hover': {
+                  textDecoration: 'underline'
+                }
+              }], onClick: this.handleRouteChange.bind(this, "user") },
+            "Sign Up"
           )
         )
       );
@@ -57694,8 +57760,10 @@ var NavBar = (function (_React$Component4) {
   return NavBar;
 })(_react2.default.Component);
 
-var MenuView = (function (_React$Component5) {
-  _inherits(MenuView, _React$Component5);
+NavBar = (0, _radium2.default)(NavBar);
+
+var MenuView = (function (_React$Component6) {
+  _inherits(MenuView, _React$Component6);
 
   function MenuView(props) {
     _classCallCheck(this, MenuView);
@@ -57730,19 +57798,19 @@ var MenuView = (function (_React$Component5) {
   return MenuView;
 })(_react2.default.Component);
 
-var App = (function (_React$Component6) {
-  _inherits(App, _React$Component6);
+var App = (function (_React$Component7) {
+  _inherits(App, _React$Component7);
 
   function App(props) {
     _classCallCheck(this, App);
 
-    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+    var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
 
-    _this7.state = store.getState();
+    _this8.state = store.getState();
     store.subscribe(function () {
-      _this7.setState(store.getState());
+      _this8.setState(store.getState());
     });
-    return _this7;
+    return _this8;
   }
 
   _createClass(App, [{
@@ -57756,12 +57824,8 @@ var App = (function (_React$Component6) {
       var venueKeys = venuesFromOfferings(this.state.offerings);
       var meals = mealsFromVenue(this.state.selectedVenue);
       var menus = menusFromMealVenue(this.state.selectedMeal, this.state.selectedVenue);
-
-      return _react2.default.createElement(
-        _Grid.Grid,
-        null,
-        _react2.default.createElement(NavBar, null),
-        _react2.default.createElement(MenuView, {
+      var ROUTES = {
+        menu: _react2.default.createElement(MenuView, {
           offerings: this.state.offerings,
           stage: this.state.filterStage,
           selectedVenue: this.state.selectedVenue,
@@ -57770,7 +57834,14 @@ var App = (function (_React$Component6) {
           selectedDate: this.state.selectedDate,
           recipes: this.state.recipes,
           selectedRecipe: this.state.selectedRecipe
-        })
+        }),
+        user: _react2.default.createElement(LoginView, null)
+      };
+      return _react2.default.createElement(
+        _Grid.Grid,
+        null,
+        _react2.default.createElement(NavBar, null),
+        ROUTES[this.state.route]
       );
     }
   }]);
