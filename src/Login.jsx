@@ -6,6 +6,12 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import Parse from 'parse';
 
+
+import {
+  Row,
+  Col,
+  Grid,
+} from './Grid.js';
 export class LoginView extends React.Component {
   constructor(props) {
     super(props);
