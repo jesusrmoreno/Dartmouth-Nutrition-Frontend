@@ -10,6 +10,25 @@ import Promise from 'bluebird';
 import Parse from 'parse';
 import { createStore } from 'redux';
 import { fontStyles } from './styles.js';
+import health from 'healthstats';
+import {
+  menusFromMealVenue,
+  mealsFromVenue,
+  venuesFromOfferings,
+  initialLoad,
+  updateLoadingStatus,
+  updateDate,
+  updateRoute,
+  updateRecipes,
+  updateOfferings,
+  updateFilterStage,
+  updateSelectedMenu,
+  updateSelectedMeal,
+  updateSelectedRecipe,
+  updateSelectedVenue,
+  store,
+} from './state.js';
+
 import {
   Grid,
   Row,
@@ -21,236 +40,26 @@ let colorTheme = {
   hover: '#f2f2f2',
 };
 
-import {
-  allRecipes,
-  allOfferings,
-  getRecipes,
-} from './Queries.js';
-
-let defaultState = {
-  loading: false,
-  offerings: {},
-  recipes: [],
-  selectedVenue: 'CYC',
-  selectedDate: moment(),
-  selectedMenu: '',
-  selectedMeal: '',
-  selectedRecipe: {},
-  filterStage: 0,
-  route: 'menu',
-};
-
 let keyToName = {
   CYC: 'The Hop',
   DDS: '\'53 Commons',
   NOVACK: 'Novack',
+  COLLIS: 'Collis',
 };
-
-function appState(state = defaultState, action) {
-  switch (action.type) {
-  case 'UPDATE_FILTERSTAGE':
-    return objectAssign({}, state, {
-      filterStage: action.filterStage
-    });
-  case 'DATE_CHANGE':
-    return objectAssign({}, state, {
-      selectedDate: action.selectedDate
-    });
-  case 'MEAL_SELECT':
-    return objectAssign({}, state, {
-    selectedMeal: action.meal
-  });
-  case 'MENU_SELECT':
-    return objectAssign({}, state, {
-    selectedMenu: action.menu
-  });
-  case 'OFFERINGS':
-    return objectAssign({}, state, {
-      offerings: action.offerings,
-      venueKeys: action.venueKeys || []
-    });
-  case 'UPDATE_OFFERINGS':
-    return objectAssign({}, state, {
-      offerings: action.offerings
-    });
-  case 'UPDATE_RECIPES':
-    return objectAssign({}, state, {
-      recipes: action.recipes
-    });
-  case 'RECIPES':
-    return objectAssign({}, state, {
-      recipes: action.recipes,
-      offerings: action.offerings,
-    });
-  case 'VENUE_SELECT':
-    return objectAssign({}, state, {
-      selectedVenue: action.venue
-    });
-
-
-  case 'UPDATE_ROUTE':
-    return objectAssign({}, state, {
-      route: action.route
-    });
-
-  case 'RECIPE_SELECT':
-    return objectAssign({}, state, {
-      selectedRecipe: action.recipe
-    });
-  default:
-    return state
-  }
-}
-
-let store = createStore(appState);
-
-let updateDate = (date) => {
-  store.dispatch({
-    type: 'DATE_CHANGE',
-    selectedDate: date
-  });
-};
-
-let updateFilterStage = (stage) => {
-  store.dispatch({
-    type: 'UPDATE_FILTERSTAGE',
-    filterStage: stage
-  });
-}
-
-let updateSelectedVenue = (venue) => {
-  console.log(venue);
-  store.dispatch({
-    type: 'VENUE_SELECT',
-    venue: venue,
-  });
-}
-
-let updateSelectedMeal = (meal) => {
-  console.log(meal);
-  store.dispatch({
-    type: 'MEAL_SELECT',
-    meal: meal,
-  });
-}
-
-let updateSelectedRecipe = (recipe) => {
-  store.dispatch({
-    type: 'RECIPE_SELECT',
-    recipe: recipe,
-  });
-}
-
-let updateSelectedMenu = (menu) => {
-  let currentState = store.getState();
-  store.dispatch({
-    type: 'MENU_SELECT',
-    menu: menu,
-  });
-  if (menu !== '') {
-    localGetRecipes(currentState.selectedVenue, menu, currentState.selectedMeal, currentState.selectedDate)
-  }
-}
-
-function localGetRecipes(venue, menu, meal, date) {
-  let offerings = store.getState().offerings;
-  let finalOffering = _.filter(offerings, (offering) => {
-    return offering.month === date.month() + 1 &&
-    offering.day === date.date() &&
-    offering.year === date.year() &&
-    offering.menuName === menu &&
-    offering.venueKey === venue &&
-    offering.mealName === meal;
-  });
-  var Subject = Parse.Object.extend("Offering");
-  var query = new Parse.Query(Subject);
-  query.get(finalOffering[0].objectId).then((subjectObj) => {
-    var relation = subjectObj.relation("recipes");
-    var query = relation.query();
-    return query.find();
-  }).then((recipes) => {
-    return recipes.map((rec) => {
-      return rec.toJSON();
-    });
-  }).then((recipes) => {
-
-    updateRecipes(_.sortBy(recipes, 'name'));
-  });
-
-
-}
-
-
-let updateRoute = (route) => {
-  store.dispatch({
-    type: 'UPDATE_ROUTE',
-    route: route
-  });
-};
-
-
-let updateOfferings = (offerings) => {
-  store.dispatch({
-    type: 'UPDATE_OFFERINGS',
-    offerings: offerings
-  });
-};
-
-let updateRecipes = (recipes) => {
-  store.dispatch({
-    type: 'UPDATE_RECIPES',
-    recipes: recipes
-  });
-};
-
-let updateLoadingStatus = (val) => {
-  store.dispatch({
-    type: 'LOADING',
-    value: val
-  });
-};
-
-function initialLoad() {
-  updateLoadingStatus('Sending Request');
-  return allOfferings().then((offerings) => {
-    updateOfferings(offerings);
-  }).then(() => {
-    updateLoadingStatus('Request Complete');
-  });
-}
-
-function venuesFromOfferings(offerings) {
-  return _.uniq(Object.keys(offerings).map((offeringKey) => {
-    return offerings[offeringKey].venueKey;
-  }));
-}
-
-function mealsFromVenue(venueKey) {
-  return _.uniq(_.filter(_.values(store.getState().offerings), (offering) => {
-    return offering.venueKey === venueKey;
-  }).map((offering) => {
-    return offering.mealName;
-  }));
-}
-
-function menusFromMealVenue(meal, venueKey) {
-  return _.uniq(_.filter(_.values(store.getState().offerings), (offering => {
-    return offering.venueKey === venueKey && offering.mealName === meal;
-  })).map((offering) => {
-    return offering.menuName;
-  })) || [];
-}
 
 class RecipeRow extends React.Component {
   constructor(props){
     super(props);
   }
+
   handleRecipeChange(recipe) {
     updateSelectedRecipe(recipe);
   }
 
   render() {
-    let recipe = this.props.recipe;
+    let recipe = this.props.recipe || {
+      nutrients: {}
+    };
     let nutrients = recipe.nutrients.result || {};
     let metaKeys = ['dairy'];
     let showWarning = false;
@@ -265,20 +74,15 @@ class RecipeRow extends React.Component {
     };
 
     let infoStyleCenter = objectAssign({}, infoStyle, {
-      alignItems: 'center',
+      alignItems: 'flex-end',
     })
-
-
 
     let first = (
       <Row key={this.props.key} style={[{
-        padding: '1.6rem',
+        padding: '.8rem 1.6rem',
         alignItems: 'center',
-        cursor: 'pointer',
         display: 'flex',
-        ':hover': {
-          background: '#f2f2f2'
-        }
+        color: 'rgba(0, 0, 0, .3)',
       }, fontStyles.body2]} onClick={this.handleRecipeChange.bind(this, recipe)}>
         <Col style={[infoStyle, {
           flex: 5,
@@ -297,15 +101,12 @@ class RecipeRow extends React.Component {
         <Col style={infoStyleCenter}>
           Protein
         </Col>
-        <Col style={[infoStyleCenter]}>
-          Alergens
-        </Col>
       </Row>
     );
 
     let notFirst = (
       <Row key={this.props.key} style={[{
-        padding: '1.6rem',
+        padding: '.4rem 1.6rem',
         alignItems: 'center',
         cursor: 'pointer',
         display: 'flex',
@@ -330,11 +131,6 @@ class RecipeRow extends React.Component {
         <Col style={infoStyleCenter}>
           {nutrients.protein === 'less than 1g' ? '0g' : nutrients.protein}
         </Col>
-        <Col style={infoStyleCenter}>
-          {showWarning ? <i style={{
-            color: '#FFCC43'
-          }} className="fa fa-exclamation-triangle"></i> : null }
-        </Col>
       </Row>
     );
     return (
@@ -348,20 +144,40 @@ class RecipeList extends React.Component {
   constructor(props) {
     super(props);
   }
-
   render() {
+    let sorted = _.groupBy(this.props.recipes, 'category');
+
     return (
       <Col style={{
         flex: 1,
         overflowY: 'scroll',
         maxHeight: 'calc(100vh - 6.4rem)',
         padding: '.8rem',
+        opacity: this.props.recipes.length > 0 ? 1 : 0,
       }}>
-        {this.props.recipes.map((recipe, i) => {
+
+        {Object.keys(sorted).map((cat, i) => {
           return (
-            <RecipeRow recipe={recipe} key={i} isFirst={i == 0}/>
+            <div style={{
+              margin: '1.6rem 0rem'
+            }}>
+
+              <Row style={[fontStyles.button, {
+                padding: '.8rem 1.6rem',
+                color: '#00CC7B',
+              }]}>
+                {cat}
+              </Row>
+              <RecipeRow key="firstRow" isFirst={true}/>
+              {sorted[cat].map((recipe, i) => {
+                return (
+                  <RecipeRow recipe={recipe} key={i} isFirst={false}/>
+                );
+              })}
+            </div>
           );
         })}
+
       </Col>
     );
   }
@@ -430,6 +246,7 @@ class Navigation extends React.Component {
             paddingBottom: '.5rem',
           }, fontStyles.caption]}>Locations</Row>
           {this.props.venueKeys.map((venueKey) => {
+            console.log(venueKey);
             let color = '#444444';
             let background = venueKey === this.props.selectedVenue ? '#f2f2f2' : 'transparent';
             return (
@@ -494,7 +311,18 @@ class LoginView extends React.Component {
         justifyContent: 'center',
         height: 'calc(100vh - 6.4rem)',
       }}>
-        Create new User
+        <div>
+          <label for="name">email</label>
+          <input type="text" id="name" />
+        </div>
+        <div>
+          <label for="mail">password</label>
+          <input type="email" id="mail" />
+        </div>
+        <div>
+          <label for="mail">retype password</label>
+          <input type="password" id="mail" />
+        </div>
       </Row>
     );
   }
@@ -521,7 +349,6 @@ class NavBar extends React.Component {
           justifyContent: 'center',
           color: 'white',
           padding: '.8rem',
-          background: '#00AE69',
           height: '100%',
           width: '20rem',
         }]}>
@@ -590,6 +417,7 @@ class MenuView extends React.Component {
   }
 
   render() {
+    console.log(this.props.offerings)
     let venueKeys = venuesFromOfferings(this.props.offerings);
     let meals = mealsFromVenue(this.props.selectedVenue);
     let menus = menusFromMealVenue(this.props.selectedMeal, this.props.selectedVenue);
@@ -622,13 +450,11 @@ class App extends React.Component {
     initialLoad();
   }
   render() {
-    let venueKeys = venuesFromOfferings(this.state.offerings);
-    let meals = mealsFromVenue(this.state.selectedVenue);
-    let menus = menusFromMealVenue(this.state.selectedMeal, this.state.selectedVenue);
+    console.log(this.state.recipes);
     let ROUTES = {
       menu: (
         <MenuView
-          offerings={this.state.offerings}
+          offerings={this.state.offeringsAvailable}
           stage={this.state.filterStage}
           selectedVenue={this.state.selectedVenue}
           selectedMeal={this.state.selectedMeal}
