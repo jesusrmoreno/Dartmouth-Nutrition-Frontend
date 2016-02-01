@@ -68,6 +68,12 @@ let fontStyles = {
   },
 };
 
+
+let animated = {
+  transition: '250ms all'
+};
+
 module.exports = {
-  fontStyles: fontStyles
+  fontStyles: fontStyles,
+  animated: animated,
 };

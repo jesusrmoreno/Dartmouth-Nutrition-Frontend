@@ -68,15 +68,17 @@ class NavBar extends React.Component {
         height: '6.4rem',
         background: '#00CC7B',
         alignItems: 'center',
+        zIndex: '10000',
       }]}>
         <Col style={[fontStyles.headline, {
           justifyContent: 'center',
           color: 'white',
-          padding: '.8rem',
+          padding: '1.6rem',
           height: '100%',
           width: '20rem',
+          fontFamily: '"Slabo 27px"',
         }]}>
-          DartMouth
+          D-Mouth
         </Col>
         <Row style={[fontStyles.subheading, {
           justifyContent: 'flex-end',

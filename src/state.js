@@ -23,13 +23,13 @@ let defaultState = {
   offerings: {},
   offeringsAvailable: {},
   recipes: [],
-  selectedVenue: 'CYC',
+  selectedVenue: '',
   selectedDate: moment(),
   selectedMenu: '',
   selectedMeal: '',
   selectedRecipe: {},
   filterStage: 0,
-  route: 'menu',
+  route: 'user',
 };
 
 function appState(state = defaultState, action) {
@@ -230,6 +230,14 @@ function initialLoad() {
     let selectedDate = store.getState().selectedDate;
     let availableForDate = offeringsForDate(selectedDate.date(), selectedDate.month() + 1, selectedDate.year());
     updateAvailableOfferings(availableForDate);
+    let initialOffering = venuesFromOfferings(availableForDate)[0];
+    let initialMeal = mealsFromVenue(initialOffering)[0];
+    let initialMenu = menusFromMealVenue(initialMeal, initialOffering)[0];
+    console.log(menusFromMealVenue(initialMeal, initialOffering));
+    updateSelectedVenue(initialOffering);
+    updateSelectedMeal(initialMeal);
+    updateSelectedMenu(initialMenu);
+
   }).then(() => {
     updateLoadingStatus('Request Complete');
   });
