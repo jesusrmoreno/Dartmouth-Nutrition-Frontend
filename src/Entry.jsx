@@ -14,7 +14,7 @@ import health from 'healthstats';
 import {
   MenuView
 } from './MenuView.jsx';
-
+import { logOut, currentUser } from './Queries.js';
 import { LoginView } from './Login.jsx';
 import {
   menusFromMealVenue,
@@ -31,6 +31,7 @@ import {
   updateSelectedMeal,
   updateSelectedRecipe,
   updateSelectedVenue,
+  updateUser,
   store,
 } from './state.js';
 
@@ -61,6 +62,10 @@ class NavBar extends React.Component {
   handleRouteChange(route) {
     updateRoute(route)
   }
+  handleSignClick() {
+    this.props.currentUser === null ? this.handleRouteChange('user') : logOut();
+    updateUser(currentUser());
+  }
   render() {
     return (
       <Row style={[{
@@ -78,7 +83,7 @@ class NavBar extends React.Component {
           width: '20rem',
           fontFamily: '"Slabo 27px"',
         }]}>
-          D-Mouth
+          DartMouth
         </Col>
         <Row style={[fontStyles.subheading, {
           justifyContent: 'flex-end',
@@ -125,8 +130,8 @@ class NavBar extends React.Component {
             ':hover': {
               textDecoration: 'underline',
             },
-          }]} onClick={this.handleRouteChange.bind(this, "user")}>
-            Sign Up
+          }]} onClick={this.handleSignClick.bind(this, "user")}>
+            {this.props.currentUser !== null ? `Sign Out ${this.props.currentUser.getEmail()}` : 'Log In/Sign Up'}
           </div>
         </Row>
       </Row>
@@ -168,7 +173,7 @@ class App extends React.Component {
     };
     return (
       <Grid>
-        <NavBar />
+        <NavBar currentUser={this.state.currentUser}/>
         {ROUTES[this.state.route]}
       </Grid>
     )

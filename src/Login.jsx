@@ -12,32 +12,70 @@ import {
 } from './Grid.js';
 import { fontStyles, animated } from './styles.js';
 
+import {
+  updateUser,
+  updateRoute,
+} from './state.js';
 
+import {
+  newUser,
+  currentUser,
+  loginUser,
+} from './Queries.js';
 
-function maleBMR (weight, height, age) {
-  var BMR = 66 + (6.23 * weight) + (12.7 * height) - (6.8 * age);
-  return BMR;
-}
+let inputStyle = [animated, fontStyles.body2, {
+  outline: 'none',
+  background: '#f4f4f4',
+  padding: '.8rem',
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  borderBottom: '2px solid transparent',
+  width: '100%',
+  margin: '1.6rem 0rem',
+  ':focus': {
+    borderBottom: '2px solid #00CC7B',
+  }
+}];
+
 
 class LoginForm extends React.Component {
+
   constructor(props) {
     super(props);
+    this.state = {
+      email: undefined,
+      password: undefined,
+    };
   }
+  attemptLogin() {
+    console.log('attempting signup');
+    let username = this.state.email;
+    let password = this.state.password;
+
+    loginUser(username, password).then((user) => {
+      updateUser(currentUser());
+      updateRoute('menu');
+    }).catch((user, error) => {
+      console.log(error);
+    });
+
+  }
+
+  changeEmail(event) {
+    this.setState({
+      email: event.target.value,
+    });
+  }
+
+  changePassword(event) {
+    this.setState({
+      password: event.target.value,
+    });
+  }
+
   render() {
-    let inputStyle = [animated, fontStyles.body2, {
-      outline: 'none',
-      background: '#f4f4f4',
-      padding: '.8rem',
-      borderTop: 'none',
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderBottom: '2px solid transparent',
-      width: '100%',
-      margin: '1.6rem 0rem',
-      ':focus': {
-        borderBottom: '2px solid #00CC7B',
-      }
-    }];
+    let formFilled = this.state.email !== undefined && this.state.password !== undefined;
     return (
       <Col style={{
         justifyContent: 'center',
@@ -51,21 +89,21 @@ class LoginForm extends React.Component {
           width: '240px',
           border: '2px solid #00CC7B',
         }]}>
-          <Col>
-            <Row><input key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
-          </Col>
-          <Col>
-            <Row><input key="password" style={inputStyle}  type="password" placeholder="Password"/></Row>
-          </Col>
-          <button style={[fontStyles.button, {
-            background: '#00CC7B',
+        <Col>
+          <Row><input onChange={this.changeEmail.bind(this)} key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
+        </Col>
+        <Col>
+          <Row><input onChange={this.changePassword.bind(this)}  key="password" style={inputStyle}  type="password" placeholder="Password"/></Row>
+        </Col>
+          <button disabled={!formFilled} style={[fontStyles.button, {
+            background: !formFilled ? '#7E8C8D' : '#00CC7B',
             padding: '.8rem',
             color: 'white',
             outline: 'none',
             border: 'none',
             margin: '1.6rem 0rem',
             cursor: 'pointer',
-          }]}>Log In</button>
+          }]} onClick={this.attemptLogin.bind(this)}>Log In</button>
         </Col>
       </Col>
     );
@@ -77,55 +115,65 @@ class NewUserForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      age: 0,
-      weight: 0,
-      height: 0,
-      calculated: 2000,
+      email: undefined,
+      password: undefined,
+      passwordMatch: undefined,
+      calculated: undefined,
     };
   }
 
-  calcCalories() {
+  changeEmail(event) {
     this.setState({
-      calculated: maleBMR(this.state.weight, this.state.height, this.state.age),
+      email: event.target.value,
     });
   }
 
-  setAge(event) {
+  changePassword(event) {
     this.setState({
-      age: event.target.value,
+      password: event.target.value,
     });
-    this.calcCalories();
   }
 
-  setWeight(event) {
+  changePasswordMatch(event) {
     this.setState({
-      weight: event.target.value,
+      passwordMatch: event.target.value,
     });
-    this.calcCalories();
   }
 
-  setHeight(event) {
+  changeCalories(event) {
     this.setState({
-      height: event.target.value,
+      calculated: event.target.value,
     });
-    this.calcCalories();
+  }
+
+  attemptSignUp() {
+    console.log('attempting signup');
+    let username = this.state.email;
+    let password = this.state.password;
+    let goalCalories = this.state.calculated || 2000;
+
+    newUser(username, password, parseInt(goalCalories)).then((user) => {
+      updateUser(currentUser());
+      updateRoute('menu');
+    }).catch((user, error) => {
+      console.log(error);
+    });
   }
 
   render() {
-    let inputStyle = [animated, fontStyles.body2, {
-      outline: 'none',
-      background: '#f4f4f4',
-      padding: '.8rem',
-      borderTop: 'none',
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderBottom: '2px solid transparent',
-      width: '100%',
-      margin: '1.6rem 0rem',
+
+
+    let validPassword = this.state.password === this.state.passwordMatch;
+    let passwordUnderlineColor = validPassword ? 'transparent' : '#EC4A41';
+    let passwordStyle = [inputStyle, {
+      borderBottom: '2px solid ' + passwordUnderlineColor,
       ':focus': {
-        borderBottom: '2px solid #00CC7B',
+        borderBottom: validPassword ? '2px solid #00CC7B' : '2px solid ' +  '#EC4A41',
       }
     }];
+
+
+    let formFilled = validPassword && this.state.email !== undefined && this.state.calculated !== undefined && parseInt(this.state.calculated) > 0;
     return (
       <Col style={{
         justifyContent: 'center',
@@ -140,36 +188,27 @@ class NewUserForm extends React.Component {
           border: '2px solid #00CC7B',
         }]}>
           <Col>
-            <Row><input key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
+            <Row><input onChange={this.changeEmail.bind(this)} key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
           </Col>
           <Col>
-            <Row><input key="password" style={inputStyle}  type="password" placeholder="Password"/></Row>
+            <Row><input onChange={this.changePassword.bind(this)}  key="password" style={inputStyle}  type="password" placeholder="Password"/></Row>
           </Col>
           <Col>
-            <Row><input key="password_reentry" style={inputStyle}  type="password" placeholder="Retype Password"/></Row>
+            <Row><input onChange={this.changePasswordMatch.bind(this)} key="password_reentry" style={passwordStyle}  type="password" placeholder="Retype Password"/></Row>
           </Col>
           <Col>
-            <Row><input onChange={this.setWeight.bind(this)} key="weight" style={inputStyle}  type="number" placeholder="weight lbs" value={this.state.weight}/></Row>
-          </Col>
-          <Col>
-            <Row><input onChange={this.setHeight.bind(this)} key="height" style={inputStyle}  type="number" placeholder="height inches" value={this.state.height}/></Row>
-          </Col>
-          <Col>
-            <Row><input onChange={this.setAge.bind(this)} key="age" style={inputStyle}  type="number" placeholder="age" value={this.state.age}/></Row>
-          </Col>
-          <Col>
-            <Row><input readOnly={true} key="calories" style={inputStyle}  type="number" placeholder="calculatedCalories" value={this.state.calculated}/></Row>
+            <Row><input onChange={this.changeCalories.bind(this)} key="calories" style={inputStyle}  type="number" placeholder="Goal Calories" value={this.state.calculated}/></Row>
           </Col>
 
-          <button style={[fontStyles.button, {
-            background: '#00CC7B',
+          <button disabled={!formFilled} style={[fontStyles.button, {
+            background: !formFilled ? '#7E8C8D' : '#00CC7B',
             padding: '.8rem',
             color: 'white',
             outline: 'none',
             border: 'none',
             margin: '1.6rem 0rem',
             cursor: 'pointer',
-          }]}>Log In</button>
+          }]} onClick={this.attemptSignUp.bind(this)}>Sign Up</button>
         </Col>
       </Col>
     );
@@ -180,11 +219,17 @@ class NewUserForm extends React.Component {
 export class LoginView extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      which: 'Log In',
+    };
   }
 
   render() {
+    let toRender = this.state.which === 'Log In' ? <LoginForm /> : <NewUserForm />;
     return (
-      <LoginForm />
+      <div>
+        {toRender}
+      </div>
     );
   }
 

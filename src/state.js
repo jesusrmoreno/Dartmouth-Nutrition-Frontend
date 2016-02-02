@@ -16,6 +16,7 @@ import {
   allRecipes,
   allOfferings,
   getRecipes,
+  currentUser,
 } from './Queries.js';
 
 let defaultState = {
@@ -29,7 +30,8 @@ let defaultState = {
   selectedMeal: '',
   selectedRecipe: {},
   filterStage: 0,
-  route: 'user',
+  route: 'menu',
+  currentUser: null,
 };
 
 function appState(state = defaultState, action) {
@@ -84,12 +86,27 @@ function appState(state = defaultState, action) {
     return objectAssign({}, state, {
       selectedRecipe: action.recipe
     });
+
+  case 'UPDATE_USER':
+    return objectAssign({}, state, {
+      currentUser: action.user,
+    });
+
   default:
     return state
   }
 }
 
 let store = createStore(appState);
+
+
+let updateUser = (user) => {
+  store.dispatch({
+    type: 'UPDATE_USER',
+    user: user
+  });
+}
+
 
 let updateDate = (date) => {
   store.dispatch({
@@ -145,7 +162,6 @@ let updateSelectedMenu = (menu) => {
 
 function localGetRecipes(venue, menu, meal, date) {
   let offerings = store.getState().offerings;
-
   let finalOffering = _.filter(offerings, (offering) => {
     return offering.month === date.month() + 1 &&
     offering.day === date.date() &&
@@ -165,7 +181,6 @@ function localGetRecipes(venue, menu, meal, date) {
       return rec.toJSON();
     });
   }).then((recipes) => {
-
     updateRecipes(_.sortBy(recipes, 'name'));
   });
 
@@ -225,6 +240,7 @@ function offeringsForDate(day, month, year) {
 
 function initialLoad() {
   updateLoadingStatus('Sending Request');
+  updateUser(currentUser());
   return allOfferings().then((offerings) => {
     updateOfferings(offerings);
     let selectedDate = store.getState().selectedDate;
@@ -283,5 +299,6 @@ export {
   updateSelectedMeal,
   updateSelectedRecipe,
   updateSelectedVenue,
+  updateUser,
   store,
 };

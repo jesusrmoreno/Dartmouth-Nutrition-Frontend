@@ -7,6 +7,45 @@ Parse.initialize("BAihtNGpVTx4IJsuuFV5f9LibJGnD1ZBOsnXk9qp", "8HwbJEWOncZ67sonTm
 
 const QUERYLIMIT = 1000;
 
+export function currentUser() {
+  return Parse.User.current();
+}
+export function logOut() {
+  return Parse.User.logOut();
+}
+
+export function newUser(username, password, goalCalories) {
+  let user = new Parse.User();
+  user.set('username', username);
+  user.set('email', username);
+  user.set('password', password);
+  user.set('goalDailyCalories', goalCalories);
+  return new Promise((resolve, reject) => {
+    user.signUp(null, {
+      success: (user) => {
+        resolve(user);
+      },
+      error: (user, error) => {
+        console.log(error);
+        reject(user, error);
+      }
+    });
+  });
+}
+
+export function loginUser(username, password) {
+  return new Promise((resolve, reject) => {
+    Parse.User.logIn(username, password, {
+      success: (user) => {
+        resolve(user);
+      },
+      error: (user, error) => {
+        console.log(error);
+        reject(user, error);
+      }
+    });
+  });
+}
 // Gets all the recipes from Parse...
 export function allRecipes() {
   let finalRecipes = {};
