@@ -150,12 +150,14 @@ export function loginUser(username, password) {
     });
   });
 }
+
 // Gets all the recipes from Parse...
 export function allRecipes() {
   let finalRecipes = {};
   function getRecipes(skipValue, resolve) {
     let Recipe = Parse.Object.extend('Recipe');
     let query = new Parse.Query(Recipe);
+    query.exists('dartmouthId');
     query.limit(QUERYLIMIT).skip(skipValue).find().then((recipes) => {
       recipes.forEach((recipe) => {
         finalRecipes[recipe.id] = recipe.toJSON();

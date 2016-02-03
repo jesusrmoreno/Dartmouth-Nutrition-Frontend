@@ -33,6 +33,8 @@ let defaultState = {
   route: 'menu',
   shouldShowModal: false,
   currentUser: null,
+  allRecipes: [],
+  searchValue: '',
 };
 
 function appState(state = defaultState, action) {
@@ -40,6 +42,11 @@ function appState(state = defaultState, action) {
   case 'UPDATE_FILTERSTAGE':
     return objectAssign({}, state, {
       filterStage: action.filterStage
+    });
+
+  case 'UPDATE_SEARCHVALUE':
+    return objectAssign({}, state, {
+      searchValue: action.searchValue
     });
   case 'DATE_CHANGE':
     return objectAssign({}, state, {
@@ -98,6 +105,11 @@ function appState(state = defaultState, action) {
       shouldShowModal: action.shouldShow && state.currentUser !== null,
     });
 
+  case 'ALL_RECIPE_LOAD':
+    return objectAssign({}, state, {
+      allRecipes: action.recipes,
+    });
+
   default:
     return state
   }
@@ -110,6 +122,13 @@ let updateUser = (user) => {
   store.dispatch({
     type: 'UPDATE_USER',
     user: user
+  });
+}
+
+let updateSearchValue = (searchValue) => {
+  store.dispatch({
+    type: 'UPDATE_SEARCHVALUE',
+    searchValue: searchValue,
   });
 }
 
@@ -133,7 +152,7 @@ let updateFilterStage = (stage) => {
 }
 
 let updateSelectedVenue = (venue) => {
-  console.log(venue);
+
   store.dispatch({
     type: 'VENUE_SELECT',
     venue: venue,
@@ -141,7 +160,7 @@ let updateSelectedVenue = (venue) => {
 }
 
 let updateSelectedMeal = (meal) => {
-  console.log(meal);
+
   store.dispatch({
     type: 'MEAL_SELECT',
     meal: meal,
@@ -152,6 +171,13 @@ let updateSelectedRecipe = (recipe) => {
   store.dispatch({
     type: 'RECIPE_SELECT',
     recipe: recipe,
+  });
+}
+
+let updateAllRecipes = (recipes) => {
+  store.dispatch({
+    type: 'ALL_RECIPE_LOAD',
+    recipes: recipes,
   });
 }
 
@@ -193,7 +219,7 @@ function localGetRecipes(venue, menu, meal, date) {
 
 
 let updateAddRecipeModal = (shouldShow) => {
-  console.log('Called', shouldShow);
+
   store.dispatch({
     type: 'UPDATE_RECIPE_MODAL',
     shouldShow: shouldShow,
@@ -215,8 +241,6 @@ let updateOfferings = (offerings) => {
 };
 
 let updateAvailableOfferings = (offerings) => {
-  console.log("From available");
-  console.log(Object.keys(offerings).length);
   store.dispatch({
     type: 'UPDATE_AVAILABLE_OFFERINGS',
     offerings: offerings
@@ -260,7 +284,7 @@ function initialLoad() {
     let initialOffering = venuesFromOfferings(availableForDate)[0];
     let initialMeal = mealsFromVenue(initialOffering)[0];
     let initialMenu = menusFromMealVenue(initialMeal, initialOffering)[0];
-    console.log(menusFromMealVenue(initialMeal, initialOffering));
+
     updateSelectedVenue(initialOffering);
     updateSelectedMeal(initialMeal);
     updateSelectedMenu(initialMenu);
@@ -312,4 +336,6 @@ export {
   updateSelectedVenue,
   updateUser,
   store,
+  updateAllRecipes,
+  updateSearchValue,
 };

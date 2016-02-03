@@ -22,6 +22,7 @@ import {
   currentUser,
   getUserMealsForDate,
   recentRecipes,
+  allRecipes,
 } from './Queries.js';
 import { LoginView } from './Login.jsx';
 import {
@@ -41,6 +42,7 @@ import {
   updateSelectedVenue,
   updateUser,
   store,
+  updateAllRecipes,
 
 } from './state.js';
 
@@ -351,8 +353,16 @@ class App extends React.Component {
   }
   componentDidMount() {
     initialLoad();
+    allRecipes().then((recipes) => {
+      updateAllRecipes(recipes);
+    });
   }
   render() {
+
+    let recipesToShow = this.state.searchValue === '' ? this.state.recipes : _.filter(this.state.allRecipes, (recipe) => {
+      return recipe.name.toLowerCase().indexOf(this.state.searchValue.toLowerCase()) !== -1;
+    });
+
     let ROUTES = {
       menu: (
         <MenuView
@@ -362,7 +372,7 @@ class App extends React.Component {
           selectedMeal={this.state.selectedMeal}
           selectedMenu={this.state.selectedMenu}
           selectedDate={this.state.selectedDate}
-          recipes={this.state.recipes}
+          recipes={recipesToShow}
           selectedRecipe={this.state.selectedRecipe}
           shouldShowModal={this.state.shouldShowModal}
         />

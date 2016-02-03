@@ -28,6 +28,7 @@ import {
   updateSelectedVenue,
   store,
   updateAddRecipeModal,
+  updateSearchValue,
 } from './state.js';
 
 import { fontStyles, animated } from './styles.js';
@@ -330,7 +331,7 @@ export class RecipeRow extends React.Component {
         </Col>
       </Row>
     );
-    console.log(recipe.name, nutrients.calories * multiplier, multiplier, nutrients.calories);
+
     let notFirst = (
       <Row key={this.props.key} style={[{
         padding: '.4rem 1.6rem',
@@ -420,6 +421,9 @@ RecipeList = Radium(RecipeList);
 class Navigation extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      searchValue: '',
+    };
   }
   handleDateChange(date) {
     updateDate(date);
@@ -449,6 +453,20 @@ class Navigation extends React.Component {
     updateSelectedRecipe({});
     updateFilterStage(2);
   }
+
+  handleSearch(event) {
+    this.setState({
+      searchValue: event.target.value,
+    });
+  }
+
+  submitSearch(e) {
+    if (e.charCode == 13) {
+      updateSearchValue(this.state.searchValue);
+    }
+
+  }
+
   render() {
     return (
       <Col style={{
@@ -461,6 +479,11 @@ class Navigation extends React.Component {
           flex: '1',
           padding: '1rem'
         }}>
+          <Row>
+            <input style={[inputStyle, {
+              margin: '.8rem 0rem .8rem',
+            }]} onChange={this.handleSearch.bind(this)} onKeyPress={this.submitSearch.bind(this)} placeholder="Search All Recipes" value={this.state.searchValue}/>
+          </Row>
           <Row style={[{
             color: 'white',
             paddingBottom: '.5rem',
@@ -473,6 +496,7 @@ class Navigation extends React.Component {
               dateFormat={"LL"}
             />
           </Row>
+
           <Row style={[{
             color: '#444444',
             paddingBottom: '.5rem',
@@ -556,6 +580,7 @@ export class MenuView extends React.Component {
           venueKeys={venueKeys}
           meals={meals}
           menus={menus}
+          value={this.props.value}
         />
         <RecipeList recipes={this.props.recipes} selectedRecipe={this.props.selectedRecipe}/>
         <RecipeAddModal key={"Menu"} selectedRecipe={this.props.selectedRecipe} show={this.props.shouldShowModal}/>
