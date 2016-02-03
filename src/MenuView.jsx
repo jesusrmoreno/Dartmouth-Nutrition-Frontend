@@ -458,6 +458,9 @@ class Navigation extends React.Component {
     this.setState({
       searchValue: event.target.value,
     });
+    if (event.target.value === '') {
+      updateSearchValue('');
+    }
   }
 
   submitSearch(e) {
