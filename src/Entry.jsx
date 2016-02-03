@@ -150,7 +150,7 @@ class DiaryView extends React.Component {
         height: 'calc(100vh - 6.4rem)',
       }}>
         <Row style={[fontStyles.display2]}>
-          {this.state.loading === false ? 'No entries for that date' : 'Getting entries...'}
+          {this.state.loading === false ? 'No entries...' : 'Getting entries...'}
         </Row>
         <Row style={[fontStyles.display2]}>
         {this.state.loading === false ? <i className="fa fa-frown-o"></i> : <i className="fa fa-heart-o"></i>}

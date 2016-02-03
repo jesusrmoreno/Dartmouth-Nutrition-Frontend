@@ -11,10 +11,6 @@ import Parse from 'parse';
 import { createStore } from 'redux';
 import health from 'healthstats';
 
-var Select = require('react-select');
-
-
-
 import {
   menusFromMealVenue,
   mealsFromVenue,
