@@ -189,8 +189,6 @@ function localGetRecipes(venue, menu, meal, date) {
   }).then((recipes) => {
     updateRecipes(_.sortBy(recipes, 'name'));
   });
-
-
 }
 
 

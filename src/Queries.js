@@ -32,8 +32,8 @@ export function getUserMeal(title, date) {
 
   let query = new Parse.Query(UserMeal);
   query.equalTo('title', title);
-  query.greaterThan('date', moment(date).startOf('day').toDate());
-  query.lessThan('date', moment(date).endOf('day').toDate());
+  query.greaterThanOrEqualTo('date', moment(date).startOf('day').toDate());
+  query.lessThanOrEqualTo('date', moment(date).endOf('day').toDate());
   query.equalTo('user', user);
 
 
@@ -105,6 +105,19 @@ export function logOut() {
   return Parse.User.logOut();
 }
 
+export function recentRecipes() {
+  let user = currentUser();
+
+  return user.get('pastRecipes').query().find().then((recipes) => {
+    return recipes.map((rec) => {
+      return rec.toJSON();
+    });
+
+  }).then((recipes) => {
+    return _.sortBy(recipes, 'name');
+  });
+
+}
 export function newUser(username, password, goalCalories) {
   let user = new Parse.User();
   user.set('username', username);

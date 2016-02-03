@@ -33,6 +33,7 @@ import {
   store,
   updateAddRecipeModal,
 } from './state.js';
+
 import { fontStyles, animated } from './styles.js';
 
 let inputStyle = [animated, fontStyles.body2, {
@@ -89,6 +90,8 @@ export class RecipeAddModal extends React.Component {
     };
   }
 
+
+
   handleDateChange(date) {
     this.setState({
       selectedDate: date,
@@ -141,7 +144,7 @@ export class RecipeAddModal extends React.Component {
     });
 
     return (
-      <Col style={{
+      <Col key={this.props.key} style={{
         position: 'absolute',
         width: '100vw',
         height: '100vh',
@@ -312,6 +315,11 @@ export class RecipeRow extends React.Component {
         }]}>
           Recipe Name
         </Col>
+        <Col style={[infoStyleCenter, {
+          display: this.props.diaryRow ? 'flex' : 'none',
+        }]}>
+          Servings
+        </Col>
         <Col style={infoStyleCenter}>
           Calories
         </Col>
@@ -342,6 +350,11 @@ export class RecipeRow extends React.Component {
         }]}>
           {recipe.name}
         </Col>
+        <Col style={[infoStyleCenter, {
+          display: this.props.diaryRow ? 'flex' : 'none',
+        }]}>
+          {multiplier}
+        </Col>
         <Col style={infoStyleCenter}>
           {Math.floor(nutrients.calories * multiplier)}
         </Col>
@@ -364,7 +377,7 @@ export class RecipeRow extends React.Component {
 
 
 
-class RecipeList extends React.Component {
+export class RecipeList extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -549,7 +562,7 @@ export class MenuView extends React.Component {
           menus={menus}
         />
         <RecipeList recipes={this.props.recipes} selectedRecipe={this.props.selectedRecipe}/>
-        <RecipeAddModal selectedRecipe={this.props.selectedRecipe} show={this.props.shouldShowModal}/>
+        <RecipeAddModal key={"Menu"} selectedRecipe={this.props.selectedRecipe} show={this.props.shouldShowModal}/>
       </Row>
     )
   }

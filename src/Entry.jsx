@@ -15,8 +15,14 @@ import {
   MenuView,
   RecipeRow,
   RecipeAddModal,
+  RecipeList,
 } from './MenuView.jsx';
-import { logOut, currentUser, getUserMealsForDate, } from './Queries.js';
+import {
+  logOut,
+  currentUser,
+  getUserMealsForDate,
+  recentRecipes,
+} from './Queries.js';
 import { LoginView } from './Login.jsx';
 import {
   menusFromMealVenue,
@@ -65,6 +71,29 @@ let infoStyleCenter = objectAssign({}, infoStyle, {
   alignItems: 'flex-end',
 })
 
+
+class RecentRecipes extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      recipes: [],
+    };
+  }
+
+  componentDidMount() {
+    recentRecipes().then((recipes) => {
+      this.setState({
+        recipes: recipes,
+      });
+    });
+  }
+
+  render() {
+    return (
+      <RecipeList recipes={this.state.recipes}/>
+    );
+  }
+}
 
 class DiaryView extends React.Component {
   constructor(props) {
@@ -186,10 +215,10 @@ class DiaryView extends React.Component {
               <Row style={[fontStyles.display2, {
                 padding: '0.8rem 2.4rem',
               }]}> {meal.title} </Row>
-              <RecipeRow isFirst={true}/>
+              <RecipeRow isFirst={true} diaryRow={true}/>
               {meal.entries.map((entry) => {
                 return (
-                    <RecipeRow recipe={entry.recipe} multiplier={entry.servingsMultiplier} isFirst={false}/>
+                    <RecipeRow recipe={entry.recipe} multiplier={entry.servingsMultiplier} diaryRow={true} isFirst={false}/>
                 );
               })}
             </Col>
@@ -249,6 +278,15 @@ class NavBar extends React.Component {
           <Row style={{
             flex: 1
           }}>
+            <div key="menu" style={[fontStyles.subheading, {
+              padding: '.8rem',
+              cursor: 'pointer',
+              ':hover': {
+                textDecoration: 'underline',
+              },
+            }]} onClick={this.handleRouteChange.bind(this, "menu")}>
+              Menu
+            </div>
             <div key="userDiary" style={[fontStyles.subheading, {
               padding: '.8rem',
               cursor: 'pointer',
@@ -259,14 +297,15 @@ class NavBar extends React.Component {
             }]} onClick={this.handleRouteChange.bind(this, "userDiary")}>
               Diary
             </div>
-            <div key="menu" style={[fontStyles.subheading, {
+            <div key="recentRecipes" style={[fontStyles.subheading, {
               padding: '.8rem',
               cursor: 'pointer',
+              display: store.getState().currentUser === null ? 'none' : 'block',
               ':hover': {
                 textDecoration: 'underline',
               },
-            }]} onClick={this.handleRouteChange.bind(this, "menu")}>
-              Menu
+            }]} onClick={this.handleRouteChange.bind(this, "recentRecipes")}>
+              Recent Recipes
             </div>
             <div key="userPreferences" style={[fontStyles.subheading, {
               padding: '.8rem',
@@ -328,11 +367,14 @@ class App extends React.Component {
       userDiary: (
         <DiaryView />
       ),
+      recentRecipes: (
+        <RecentRecipes />
+      ),
     };
     return (
       <Grid>
         <NavBar currentUser={this.state.currentUser}/>
-        <RecipeAddModal selectedRecipe={this.state.selectedRecipe} show={this.state.shouldShowModal}/>
+        <RecipeAddModal key={"NotMenu"} selectedRecipe={this.state.selectedRecipe} show={this.state.shouldShowModal}/>
         {ROUTES[this.state.route]}
       </Grid>
     )
