@@ -101,6 +101,7 @@ class DiaryView extends React.Component {
     this.state = {
       selectedDate: moment(),
       meals: [],
+      loading: true,
     };
   }
 
@@ -112,11 +113,15 @@ class DiaryView extends React.Component {
   }
 
   getMeals(date) {
+    this.setState({
+      loading: true,
+      meals: [],
+    });
     getUserMealsForDate(date).then((meals) => {
       this.setState({
         meals: meals,
+        loading: false,
       });
-      console.log(meals);
     });
   }
 
@@ -145,10 +150,11 @@ class DiaryView extends React.Component {
         height: 'calc(100vh - 6.4rem)',
       }}>
         <Row style={[fontStyles.display2]}>
-          No entries for that date
+          {this.state.loading === false ? 'No entries for that date' : 'Getting entries...'}
         </Row>
         <Row style={[fontStyles.display2]}>
-        <i className="fa fa-frown-o"></i>
+        {this.state.loading === false ? <i className="fa fa-frown-o"></i> : <i className="fa fa-heart-o"></i>}
+
         </Row>
       </Col>
     );
