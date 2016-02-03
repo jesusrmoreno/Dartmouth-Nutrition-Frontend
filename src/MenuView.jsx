@@ -471,7 +471,6 @@ class Navigation extends React.Component {
     return (
       <Col style={{
         width: '20rem',
-        background: 'white',
         height: 'calc(100vh - 6.4rem)',
         overflowY: 'scroll',
       }}>

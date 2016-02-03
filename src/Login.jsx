@@ -79,7 +79,6 @@ class LoginForm extends React.Component {
     return (
       <Col>
         <Col style={[fontStyles.subheading, {
-          background: 'white',
           padding: '1.6rem',
           borderRadius: '.2rem',
           width: '240px',
@@ -172,7 +171,7 @@ class NewUserForm extends React.Component {
     return (
       <Col>
         <Col style={[fontStyles.subheading, {
-          background: 'white',
+          
           padding: '1.6rem',
           borderRadius: '.2rem',
           width: '240px',
