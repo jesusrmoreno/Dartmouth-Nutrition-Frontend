@@ -77,17 +77,12 @@ class LoginForm extends React.Component {
   render() {
     let formFilled = this.state.email !== undefined && this.state.password !== undefined;
     return (
-      <Col style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 'calc(100vh - 6.4rem)',
-      }}>
+      <Col>
         <Col style={[fontStyles.subheading, {
           background: 'white',
           padding: '1.6rem',
           borderRadius: '.2rem',
           width: '240px',
-          border: '2px solid #00CC7B',
         }]}>
         <Col>
           <Row><input onChange={this.changeEmail.bind(this)} key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
@@ -175,17 +170,12 @@ class NewUserForm extends React.Component {
 
     let formFilled = validPassword && this.state.email !== undefined && this.state.calculated !== undefined && parseInt(this.state.calculated) > 0;
     return (
-      <Col style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 'calc(100vh - 6.4rem)',
-      }}>
+      <Col>
         <Col style={[fontStyles.subheading, {
           background: 'white',
           padding: '1.6rem',
           borderRadius: '.2rem',
           width: '240px',
-          border: '2px solid #00CC7B',
         }]}>
           <Col>
             <Row><input onChange={this.changeEmail.bind(this)} key="Email" style={inputStyle} type="email" placeholder="Email"/></Row>
@@ -220,16 +210,57 @@ export class LoginView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      which: 'Log In',
+      which: 'Login',
     };
   }
 
+  changeForm(which) {
+    this.setState({
+      which: which
+    });
+  }
+
   render() {
-    let toRender = this.state.which === 'Log In' ? <LoginForm /> : <NewUserForm />;
+    let toRender = this.state.which === 'Login' ? <LoginForm /> : <NewUserForm />;
     return (
-      <div>
-        {toRender}
-      </div>
+      <Col style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 'calc(100vh - 6.4rem)',
+      }}>
+        <Col style={{
+          border: '2px solid #00CC7B',
+        }}>
+          <Row style={{
+            justifyContent: 'flex-start',
+            width: 240,
+            padding: '1.6rem 1.6rem 0rem',
+          }}>
+            <Col style={[fontStyles.button, {
+              paddingRight: '.8rem',
+              cursor: 'pointer',
+              // order: this.state.which === 'Login' ? -1 : 3,
+            }]}>
+              <div style={{
+                color: this.state.which === 'Login' ? '#00CC7B' : 'rgba(0, 0, 0, .27)',
+              }} onClick={this.changeForm.bind(this, 'Login')}>
+                Login
+              </div>
+            </Col>
+            <Col style={[fontStyles.button, {
+              cursor: 'pointer',
+              paddingRight: '.8rem',
+            }]}>
+              <div style={{
+                color: this.state.which === 'SignUp' ? '#00CC7B' : 'rgba(0, 0, 0, .27)',
+              }} onClick={this.changeForm.bind(this, 'SignUp')}>
+                Sign Up
+              </div>
+            </Col>
+          </Row>
+          {toRender}
+        </Col>
+      </Col>
     );
   }
 

@@ -2,11 +2,102 @@ import Parse from 'parse';
 import objectAssign from 'object-assign';
 import _ from 'lodash';
 import Promise from 'bluebird';
-
+import moment from 'moment';
 Parse.initialize("BAihtNGpVTx4IJsuuFV5f9LibJGnD1ZBOsnXk9qp", "8HwbJEWOncZ67sonTmsADWMYCF3CtcGLI9R1ZEAU");
 
 const QUERYLIMIT = 1000;
 
+
+export function getUserMealsForDate(date) {
+  let user = currentUser();
+  let UserMeal = Parse.Object.extend('UserMeal');
+  let query = new Parse.Query(UserMeal);
+
+  query.greaterThanOrEqualTo('date', moment(date).startOf('day').toDate());
+  query.lessThanOrEqualTo('date', moment(date).endOf('day').toDate());
+  console.log(date);
+  query.equalTo('user', user);
+  query.include('entries');
+  query.include('entries.recipe');
+  return query.find().then((meals) => {
+    let jsonMeals = meals.map((meal) => {
+      return meal.toJSON();
+    });
+    return _.sortBy(jsonMeals, 'date.iso');
+  });
+}
+export function getUserMeal(title, date) {
+  let user = Parse.User.current();
+  let UserMeal = Parse.Object.extend('UserMeal');
+
+  let query = new Parse.Query(UserMeal);
+  query.equalTo('title', title);
+  query.greaterThan('date', moment(date).startOf('day').toDate());
+  query.lessThan('date', moment(date).endOf('day').toDate());
+  query.equalTo('user', user);
+
+
+  return query.first().then((meal) => {
+    return meal;
+  });
+}
+
+export function createUserMeal(title, diaryEntry, date) {
+  let user = Parse.User.current();
+  let UserMeal = Parse.Object.extend('UserMeal');
+  let userMeal = new UserMeal();
+  userMeal.set('date', date);
+  userMeal.set('title', title);
+  userMeal.set('entries', [diaryEntry]);
+  userMeal.set('user', user);
+  return userMeal.save();
+}
+
+
+export function addToUserMeal(meal, diaryEntry) {
+  console.log("Attempting to update usermeal");
+
+  let entries = meal.get('entries');
+  entries.push(diaryEntry);
+  console.log(entries);
+  meal.set('entries', entries);
+  return meal.save();
+}
+
+export function addToPastRecipes(recipe) {
+  let user = Parse.User.current();
+  let relation = user.relation('pastRecipes');
+  relation.add(recipe);
+  return user.save().then((user) => {
+    console.log(user);
+  });
+}
+
+export function addToDiary(recipe, servingsMultiplier, forDate, diaryMeal) {
+  let user = Parse.User.current();
+  let DiaryEntry = Parse.Object.extend('DiaryEntry');
+  let entry = new DiaryEntry();
+  let ParseRecipe = Parse.Object.extend('Recipe');
+  let r = new ParseRecipe();
+  r.set('objectId', recipe.objectId);
+  entry.set('user', user);
+  entry.set('recipe', r);
+  entry.set('date', forDate);
+  entry.set('servingsMultiplier', servingsMultiplier);
+  console.log(servingsMultiplier);
+  return entry.save().then((entry) => {
+    // Execute any logic that should take place after the object is saved.
+    return getUserMeal(diaryMeal, forDate).then((meal) => {
+      if (meal === undefined) {
+        return createUserMeal(diaryMeal, entry, forDate)
+      } else {
+        return addToUserMeal(meal, entry);
+      }
+    }).then((userMeal) => {
+      return addToPastRecipes(r);
+    });
+  });
+}
 export function currentUser() {
   return Parse.User.current();
 }

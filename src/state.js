@@ -31,6 +31,7 @@ let defaultState = {
   selectedRecipe: {},
   filterStage: 0,
   route: 'menu',
+  shouldShowModal: false,
   currentUser: null,
 };
 
@@ -90,6 +91,11 @@ function appState(state = defaultState, action) {
   case 'UPDATE_USER':
     return objectAssign({}, state, {
       currentUser: action.user,
+    });
+
+  case 'UPDATE_RECIPE_MODAL':
+    return objectAssign({}, state, {
+      shouldShowModal: action.shouldShow && state.currentUser !== null,
     });
 
   default:
@@ -188,6 +194,13 @@ function localGetRecipes(venue, menu, meal, date) {
 }
 
 
+let updateAddRecipeModal = (shouldShow) => {
+  console.log('Called', shouldShow);
+  store.dispatch({
+    type: 'UPDATE_RECIPE_MODAL',
+    shouldShow: shouldShow,
+  });
+}
 let updateRoute = (route) => {
   store.dispatch({
     type: 'UPDATE_ROUTE',
@@ -253,7 +266,6 @@ function initialLoad() {
     updateSelectedVenue(initialOffering);
     updateSelectedMeal(initialMeal);
     updateSelectedMenu(initialMenu);
-
   }).then(() => {
     updateLoadingStatus('Request Complete');
   });
@@ -285,6 +297,7 @@ function menusFromMealVenue(meal, venueKey) {
 }
 
 export {
+  updateAddRecipeModal,
   menusFromMealVenue,
   mealsFromVenue,
   venuesFromOfferings,

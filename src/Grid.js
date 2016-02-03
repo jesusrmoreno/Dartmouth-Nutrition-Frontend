@@ -37,10 +37,10 @@ export class Row extends React.Component {
     super(props);
   }
   render() {
+    let style = this.props.style;
+    let other = _.omit(this.props, 'style');
     return (
-      <div style={[styles.row, this.props.style, this.props.fullHeight && {
-        flex: 1
-      }]}>
+      <div style={[styles.row, style]} {...other}>
         {this.props.children}
       </div>
     );
