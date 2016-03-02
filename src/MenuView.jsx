@@ -10,7 +10,7 @@ import Promise from 'bluebird';
 import Parse from 'parse';
 import { createStore } from 'redux';
 import health from 'healthstats';
-
+import {RecipeInfo} from './RecipeInfo.jsx';
 import {
   menusFromMealVenue,
   mealsFromVenue,
@@ -53,6 +53,7 @@ import {
   Grid,
   Row,
   Col,
+  Text,
 } from './Grid.js';
 
 let colorTheme = {
@@ -76,7 +77,7 @@ function numberValue(s) {
   return parseInt(s.replace('g', ''));
 }
 
-export class RecipeAddModal extends React.Component {
+export class RecipeAddModal_Bak extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,9 +87,6 @@ export class RecipeAddModal extends React.Component {
       status: 'idle',
     };
   }
-
-
-
   handleDateChange(date) {
     this.setState({
       selectedDate: date,
@@ -99,11 +97,9 @@ export class RecipeAddModal extends React.Component {
       servings: event.target.value,
     });
   }
-
   showModal(recipe) {
     updateAddRecipeModal(false);
   }
-
   addToDiary() {
     this.setState({
       status: 'posting',
@@ -116,15 +112,12 @@ export class RecipeAddModal extends React.Component {
         });
       });
   }
-
   updateDiaryMeal(event) {
     this.setState({
       selectedDiaryMeal: event.target.value,
     });
   }
-
   render() {
-
     let formFilled = this.state.servings > 0 && this.state.selectedDate !== undefined && this.state.selectedDiaryMeal !== undefined;
     let recipe = this.props.selectedRecipe.nutrients !== undefined ? this.props.selectedRecipe : {
       nutrients: {}
@@ -267,6 +260,33 @@ export class RecipeAddModal extends React.Component {
   }
 }
 
+export class RecipeAddModal extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    console.log(this.props.show)
+    return (
+      <Col key={this.props.key} style={{
+        position: 'absolute',
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0, 0, 0, .57)',
+        top: 0,
+        left: 0,
+        zIndex: 100001,
+        display: this.props.show === true ? 'flex' : 'none',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 'auto',
+        padding: '12rem',
+      }}>
+        <RecipeInfo recipe={this.props.selectedRecipe} />
+      </Col>
+    );
+  }
+}
+
 export class RecipeRow extends React.Component {
   constructor(props){
     super(props);
@@ -282,15 +302,9 @@ export class RecipeRow extends React.Component {
       nutrients: {}
     };
     let nutrients = recipe.nutrients.result || {};
-    let metaKeys = ['dairy'];
     let showWarning = false;
     let multiplier = this.props.multiplier || 1;
 
-    metaKeys.forEach((key) => {
-      if (_.has(nutrients, key) && nutrients[key] === true) {
-        showWarning = true;
-      }
-    });
     let infoStyle = {
       flex: 1,
       padding: '.8rem',
@@ -310,24 +324,24 @@ export class RecipeRow extends React.Component {
         <Col style={[infoStyle, {
           flex: 5,
         }]}>
-          Recipe Name
+          <Text type="body1">Recipe Name</Text>
         </Col>
         <Col style={[infoStyleCenter, {
           display: this.props.diaryRow ? 'flex' : 'none',
         }]}>
-          Servings
+          <Text>Servings</Text>
+        </Col>
+        <Col style={[infoStyleCenter]}>
+          <Text>Calories</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          Calories
+          <Text>Fat</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          Fat
+          <Text>Carbs</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          Carbs
-        </Col>
-        <Col style={infoStyleCenter}>
-          Protein
+          <Text>Protein</Text>
         </Col>
       </Row>
     );
@@ -352,17 +366,17 @@ export class RecipeRow extends React.Component {
         }]}>
           {multiplier}
         </Col>
-        <Col style={infoStyleCenter}>
-          {Math.floor(nutrients.calories * multiplier)}
+        <Col style={[infoStyleCenter]}>
+          <Text>{Math.floor(nutrients.calories * multiplier)}</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          {nutrients.fat === 'less than 1g' ? '0g' : Math.floor(numberValue(nutrients.fat) * multiplier)}
+          <Text>{nutrients.fat === 'less than 1g' ? '0g' : Math.floor(numberValue(nutrients.fat) * multiplier)}</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          {nutrients.carbs === 'less than 1g' ? '0g' :  Math.floor(numberValue(nutrients.carbs) * multiplier)}
+          <Text>{nutrients.carbs === 'less than 1g' ? '0g' :  Math.floor(numberValue(nutrients.carbs) * multiplier)}</Text>
         </Col>
         <Col style={infoStyleCenter}>
-          {nutrients.protein === 'less than 1g' ? '0g' :  Math.floor(numberValue(nutrients.protein) * multiplier)}
+          <Text>{nutrients.protein === 'less than 1g' ? '0g' :  Math.floor(numberValue(nutrients.protein) * multiplier)}</Text>
         </Col>
       </Row>
     );
@@ -380,6 +394,13 @@ export class RecipeList extends React.Component {
   }
   render() {
     let sorted = _.groupBy(this.props.recipes, 'category');
+    Object.keys(sorted).map((key) => {
+      sorted[key] = _.sortBy(sorted[key], 'rank');
+    });
+
+    let categories = _.sortBy(Object.keys(sorted), (cat) => {
+      return -(_.sumBy(sorted[cat], 'rank') / sorted[cat].length);
+    });
 
     return (
       <Col style={{
@@ -389,7 +410,7 @@ export class RecipeList extends React.Component {
         padding: '.8rem',
         opacity: this.props.recipes.length > 0 ? 1 : 0,
       }}>
-        {Object.keys(sorted).map((cat, i) => {
+        {categories.map((cat, i) => {
           return (
             <div key={i} style={{
               margin: '1.6rem 0rem'
@@ -425,21 +446,23 @@ class Navigation extends React.Component {
       searchValue: '',
     };
   }
+
   handleDateChange(date) {
     updateDate(date);
     updateSelectedMeal('');
     updateSelectedMenu('');
     updateSelectedRecipe({});
   }
-  handleVenueChange(venueKey) {
 
+  handleVenueChange(venueKey) {
     updateSelectedVenue(venueKey);
-    updateSelectedMeal('');
     updateSelectedRecipe({});
+    updateSelectedMeal('');
     updateSelectedMenu('');
     updateRecipes([]);
     updateFilterStage(1);
   }
+
   handleMealChange(meal) {
     updateSelectedMeal(meal);
     updateSelectedMenu('');
@@ -447,6 +470,7 @@ class Navigation extends React.Component {
     updateSelectedRecipe({});
     updateFilterStage(2);
   }
+
   handleMenuChange(menu) {
     updateSelectedMenu(menu);
     updateRecipes([]);
@@ -467,7 +491,6 @@ class Navigation extends React.Component {
     if (e.charCode == 13) {
       updateSearchValue(this.state.searchValue);
     }
-
   }
 
   render() {
@@ -502,7 +525,12 @@ class Navigation extends React.Component {
           <Row style={[{
             color: '#444444',
             paddingBottom: '.5rem',
-          }, fontStyles.caption]}>Locations</Row>
+            paddingTop: '1rem',
+          }]}>
+            <Text type="caption">
+              Locations
+            </Text>
+          </Row>
           {this.props.venueKeys.map((venueKey) => {
 
             let color = '#444444';
@@ -520,7 +548,11 @@ class Navigation extends React.Component {
             color: '#444444',
             paddingBottom: '.5rem',
             paddingTop: '1rem',
-          }, fontStyles.caption]}>Times</Row>
+          }]}>
+            <Text type="caption">
+              Times
+            </Text>
+          </Row>
           {this.props.meals.map((meal) => {
             let color = '#444444';
             let background = meal === this.props.selectedMeal ? '#f2f2f2' : 'transparent';
@@ -537,7 +569,11 @@ class Navigation extends React.Component {
             color: '#444444',
             paddingBottom: '.5rem',
             paddingTop: '1rem',
-          }, fontStyles.caption]}>Menus</Row>
+          }]}>
+            <Text type="caption">
+              Menus
+            </Text>
+          </Row>
           {this.props.menus.map((menu) => {
             let color = '#444444';
             let background = menu === this.props.selectedMenu ? '#f2f2f2' : 'transparent';
@@ -567,10 +603,10 @@ export class MenuView extends React.Component {
   }
 
   render() {
-
     let venueKeys = venuesFromOfferings(this.props.offerings);
     let meals = mealsFromVenue(this.props.selectedVenue);
     let menus = menusFromMealVenue(this.props.selectedMeal, this.props.selectedVenue);
+
     return (
       <Row>
         <Navigation

@@ -135,7 +135,7 @@ class DiaryView extends React.Component {
     let foodCalories = 0;
     this.state.meals.forEach((meal) => {
       meal.entries.forEach((entry) => {
-        foodCalories += entry.servingsMultiplier *  parseInt(entry.recipe.nutrients.result.calories);
+        foodCalories += entry.servingsMultiplier *  Math.floor(parseInt(entry.recipe.nutrients.result.calories));
       });
     });
     let happyColor = '#00CC7B';
@@ -232,7 +232,6 @@ class DiaryView extends React.Component {
             </Col>
           );
         })}
-
       </div>
     );
   }

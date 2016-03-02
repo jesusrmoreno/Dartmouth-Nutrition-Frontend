@@ -6,7 +6,7 @@ import moment from 'moment';
 Parse.initialize("BAihtNGpVTx4IJsuuFV5f9LibJGnD1ZBOsnXk9qp", "8HwbJEWOncZ67sonTmsADWMYCF3CtcGLI9R1ZEAU");
 
 const QUERYLIMIT = 1000;
-
+// The general assumption is that someone with of the same identity (in this case gender) will know better the issues that they face and as such will create policies that will benefit their identity. However this may not always be the case. While representation is great for a number of reasons (e.g. for children seeing someone in that position that is like them might make that position seem more attainable). When it comes down to it legislators should be chosen based on their beliefs, experience, and what they propose to accomplish in their time in office not on the basis of their unchangeable characteristics such as sex. That they happen to identify as a woman or a man or anything else should come second to the issues that a constituency is facing. 
 
 export function getUserMealsForDate(date) {
   let user = currentUser();

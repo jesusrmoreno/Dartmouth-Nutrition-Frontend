@@ -102,7 +102,7 @@ function appState(state = defaultState, action) {
 
   case 'UPDATE_RECIPE_MODAL':
     return objectAssign({}, state, {
-      shouldShowModal: action.shouldShow && state.currentUser !== null,
+      shouldShowModal: action.shouldShow,
     });
 
   case 'ALL_RECIPE_LOAD':

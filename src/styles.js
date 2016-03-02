@@ -12,7 +12,6 @@ let fontSizes = {
   button: '1.4rem',
 };
 
-
 let fontWeights = {
   medium: '500',
   regular: '400',
