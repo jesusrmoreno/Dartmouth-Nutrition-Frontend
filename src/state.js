@@ -34,6 +34,7 @@ let defaultState = {
   shouldShowModal: false,
   currentUser: null,
   allRecipes: [],
+  refreshDiary: true,
   searchValue: '',
 };
 
@@ -84,6 +85,11 @@ function appState(state = defaultState, action) {
       selectedVenue: action.venue
     });
 
+  case 'UPDATE_REFRESH_DIARY':
+    return objectAssign({}, state, {
+      refreshDiary: action.shouldRefresh
+    });
+
 
   case 'UPDATE_ROUTE':
     return objectAssign({}, state, {
@@ -122,6 +128,12 @@ let updateUser = (user) => {
   store.dispatch({
     type: 'UPDATE_USER',
     user: user
+  });
+}
+let updateRefreshDiary = (shouldRefresh) => {
+  store.dispatch({
+    type: 'UPDATE_REFRESH_DIARY',
+    shouldRefresh: shouldRefresh,
   });
 }
 
@@ -338,4 +350,5 @@ export {
   store,
   updateAllRecipes,
   updateSearchValue,
+  updateRefreshDiary,
 };

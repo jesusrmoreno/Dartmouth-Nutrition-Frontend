@@ -265,7 +265,6 @@ export class RecipeAddModal extends React.Component {
     super(props);
   }
   render() {
-    console.log(this.props.show)
     return (
       <Col key={this.props.key} style={{
         position: 'absolute',
@@ -281,7 +280,7 @@ export class RecipeAddModal extends React.Component {
         margin: 'auto',
         padding: '12rem',
       }}>
-        <RecipeInfo recipe={this.props.selectedRecipe} />
+        <RecipeInfo recipe={this.props.selectedRecipe} inDiary={this.props.inDiary} showDeleteButton={this.props.showDeleteButton}/>
       </Col>
     );
   }
@@ -293,6 +292,12 @@ export class RecipeRow extends React.Component {
   }
 
   showModal(recipe) {
+    if (this.props.recipePointer !== undefined && this.props.recipePointer.objectId !== undefined) {
+      recipe["__diaryEntry"] = this.props.recipePointer.objectId;
+      if (this.props.userMeal !== undefined) {
+        recipe["__userMeal"] = this.props.userMeal;
+      }
+    }
     updateSelectedRecipe(recipe);
     updateAddRecipeModal(true);
   }

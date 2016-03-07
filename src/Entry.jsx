@@ -11,6 +11,16 @@ import Parse from 'parse';
 import { createStore } from 'redux';
 import { fontStyles } from './styles.js';
 import health from 'healthstats';
+
+
+// TODO:
+//  Past Meals
+//  Update in Diary instead of Creating a new One
+//  Fix the nutritional Info
+//  Custom Food
+//  Search Database
+
+
 import {
   MenuView,
   RecipeRow,
@@ -25,6 +35,7 @@ import {
   allRecipes,
 } from './Queries.js';
 import { LoginView } from './Login.jsx';
+
 import {
   menusFromMealVenue,
   mealsFromVenue,
@@ -43,6 +54,7 @@ import {
   updateUser,
   store,
   updateAllRecipes,
+  updateRefreshDiary,
 
 } from './state.js';
 
@@ -97,6 +109,20 @@ class RecentRecipes extends React.Component {
   }
 }
 
+class RecentMeals extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <Col>
+        Hello World
+      </Col>
+    );
+  }
+}
+
+let mealOrder = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 class DiaryView extends React.Component {
   constructor(props) {
     super(props);
@@ -117,26 +143,38 @@ class DiaryView extends React.Component {
   getMeals(date) {
     this.setState({
       loading: true,
-      meals: [],
+      meals: {},
     });
     getUserMealsForDate(date).then((meals) => {
       this.setState({
-        meals: meals,
+        meals: _.keyBy(meals, 'title'),
         loading: false,
       });
+      updateRefreshDiary(false)
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.shouldRefresh === true) {
+      this.getMeals(this.state.selectedDate);
+    }
+  }
+
   componentDidMount() {
+    updateRefreshDiary(false)
     this.getMeals(this.state.selectedDate);
+
   }
 
   render() {
     let foodCalories = 0;
-    this.state.meals.forEach((meal) => {
-      meal.entries.forEach((entry) => {
-        foodCalories += entry.servingsMultiplier *  Math.floor(parseInt(entry.recipe.nutrients.result.calories));
-      });
+    mealOrder.forEach((mealKey) => {
+      let meal = this.state.meals[mealKey];
+      if (!_.isUndefined(meal)) {
+        meal.entries.forEach((entry) => {
+          foodCalories += entry.servingsMultiplier *  Math.floor(parseInt(entry.recipe.nutrients.result.calories));
+        });
+      }
     });
     let happyColor = '#00CC7B';
     let sadColor = '#EC4A41';
@@ -179,8 +217,6 @@ class DiaryView extends React.Component {
             <DatePicker
               selected={this.state.selectedDate}
               onChange={this.handleChange.bind(this)}
-              maxDate={moment().add(5, 'days')}
-              minDate={moment().subtract(10, 'days')}
               dateFormat={"LL"}
             />
           </Col>
@@ -215,18 +251,23 @@ class DiaryView extends React.Component {
             </Row>
           </Col>
         </Row>
-        {this.state.meals.length === 0 ? noMealsForDate : null}
+        {_.keys(this.state.meals).length === 0 ? noMealsForDate : null}
         <Row style={{height: '6.4rem'}}></Row>
-        {this.state.meals.map((meal) => {
+        {mealOrder.map((key) => {
+          let meal = this.state.meals[key];
+          if (_.isUndefined(meal)) {
+            return null;
+          }
+
           return (
             <Col>
               <Row style={[fontStyles.display2, {
                 padding: '0.8rem 2.4rem',
-              }]}> {meal.title} </Row>
+              }]}>{meal.title}</Row>
               <RecipeRow isFirst={true} diaryRow={true}/>
               {meal.entries.map((entry) => {
                 return (
-                    <RecipeRow recipe={entry.recipe} multiplier={entry.servingsMultiplier} diaryRow={true} isFirst={false}/>
+                    <RecipeRow userMeal={meal} recipePointer={entry} recipe={entry.recipe} multiplier={entry.servingsMultiplier} diaryRow={true} isFirst={false}/>
                 );
               })}
             </Col>
@@ -380,16 +421,25 @@ class App extends React.Component {
         <LoginView />
       ),
       userDiary: (
-        <DiaryView />
+        <DiaryView shouldRefresh={this.state.refreshDiary}/>
       ),
       recentRecipes: (
         <RecentRecipes />
       ),
+      recentMeals: (
+        <RecentMeals />
+      )
     };
     return (
       <Grid>
         <NavBar currentUser={this.state.currentUser}/>
-        <RecipeAddModal key={"NotMenu"} selectedRecipe={this.state.selectedRecipe} show={this.state.shouldShowModal}/>
+        <RecipeAddModal
+          key={"NotMenu"}
+          selectedRecipe={this.state.selectedRecipe}
+          show={this.state.shouldShowModal}
+          showDeleteButton={this.state.route === 'userDiary'}
+          inDiary={this.state.route === 'userDiary'}
+        />
         {ROUTES[this.state.route]}
       </Grid>
     )

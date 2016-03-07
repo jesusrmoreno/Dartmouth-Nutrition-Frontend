@@ -31,7 +31,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "watchify -v -d -t [ babelify --presets [ babel-preset-react babel-preset-es2015 ] ] src/Entry.jsx -o build/bundle.js"
   },
   "author": "",
   "license": "ISC"
