@@ -36,6 +36,7 @@ import {
   addToDiary,
   deleteRecipeFromMeal,
   editEntryInMeal,
+  currentUser,
 } from './Queries.js';
 
 let mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
@@ -285,8 +286,10 @@ export class NutritionalInfo extends React.Component {
                 </Text>
               </Col>
             </Row>
+
             <Row style={{
               padding: '.4rem 0rem',
+              display: currentUser() !== null ? 'flex' : 'none',
             }}>
               <Col style={{
                 flex: 1,
@@ -322,6 +325,7 @@ export class NutritionalInfo extends React.Component {
                 padding: '.8rem .8rem .8rem 0rem',
                 background: 'white',
                 flex: 1,
+                display: currentUser() !== null ? 'flex' : 'none',
               }]}>
                 Meal
               </Col>
@@ -330,6 +334,7 @@ export class NutritionalInfo extends React.Component {
                 flex: 1,
                 background: '#f4f4f4',
                 padding: '.8rem .4rem',
+                display: currentUser() !== null ? 'flex' : 'none',
               }}>
                 <select value={this.state.selectedDiaryMeal} style={{
                   fontSize: '1.6rem',
@@ -340,15 +345,6 @@ export class NutritionalInfo extends React.Component {
                   width: '100%',
                 }} onChange={this.updateDiaryMeal.bind(this)}>
                   {mealOptions.map((val) => {
-                    if (this.props.recipe.__userMeal !== undefined) {
-                      console.log(val === this.props.recipe.__userMeal.title);
-                      console.log(this.props.recipe.__userMeal.title)
-                      return (
-                        <option selected={val === this.props.recipe.__userMeal.title} key={val} value={val}>{val}</option>
-                      );
-                    } else {
-
-                    }
                     return (
                       <option key={val} value={val}>{val}</option>
                     );
@@ -382,6 +378,7 @@ export class NutritionalInfo extends React.Component {
               }}>
                 <Row style={[{
                   color: 'white',
+                  display: currentUser() !== null ? 'flex' : 'none',
                 }, fontStyles.caption]}>
                   <DatePicker
                     selected={this.state.selectedDate}
@@ -392,6 +389,7 @@ export class NutritionalInfo extends React.Component {
               </Col>
               <Col style={{
                 flex: 1,
+                display: currentUser() !== null ? 'flex' : 'none',
               }}>
                 <button disabled={false} style={[fontStyles.button, {
                   background: false ? '#7E8C8D' : '#00CC7B',
